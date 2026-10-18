@@ -36,10 +36,3 @@ Assets (the contents of the ``assets`` folder) may be used in forks of Fahrenhei
 
 For third-party code license notices, please see
 [THIRD-PARTY-NOTICES](https://github.com/fahrenheit-crew/fahrenheit/blob/main/THIRD-PARTY-NOTICES).
-
-## Disclaimers
-Fahrenheit does not accept contributions (issues or PRs) generated with or assisted by AI.
-We may decline such contributions at any time without further explanation.
-
-You are welcome to open issues and PRs without such assistance, regardless of your technical ability
-or ability to speak English. We are willing to assist you in reporting problems, creating feature requests, or making contributions.
