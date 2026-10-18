@@ -54,11 +54,17 @@ internal sealed unsafe partial class Program {
           | SDLWindowFlags.Hidden
           | SDLWindowFlags.HighPixelDensity;
 
-        _sdl_window = SDL.CreateWindow(
-            "Fahrenheit Setup",
-            int.CreateChecked(MathF.Round(820 * main_display_scale)),
-            int.CreateChecked(MathF.Round(940 * main_display_scale)),
-            window_flags);
+        // The page is tall. On small or highly scaled screens, fit the window to the screen instead. The page then scrolls.
+        int width  = int.CreateChecked(MathF.Round(820 * main_display_scale));
+        int height = int.CreateChecked(MathF.Round(940 * main_display_scale));
+
+        SDLRect usable = default;
+        if (SDL.GetDisplayUsableBounds(main_display_id, &usable)) {
+            width  = Math.Min(width,  usable.W * 9 / 10);
+            height = Math.Min(height, usable.H * 9 / 10);
+        }
+
+        _sdl_window = SDL.CreateWindow("Fahrenheit Setup", width, height, window_flags);
 
         if (_sdl_window == null) {
             Console.WriteLine($"Fault in SDL_CreateWindow() - {SDL.GetErrorS()}");

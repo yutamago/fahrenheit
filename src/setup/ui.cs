@@ -76,7 +76,9 @@ internal sealed unsafe class FhSetupUi : IDisposable {
         ImGui.SetNextWindowPos (viewport.WorkPos);
         ImGui.SetNextWindowSize(viewport.WorkSize);
 
-        ImGuiWindowFlags flags = ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoSavedSettings;
+        // Keeps the scrollbar, for windows smaller than the page.
+        ImGuiWindowFlags flags = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse
+                               | ImGuiWindowFlags.NoMove     | ImGuiWindowFlags.NoSavedSettings;
         if (!ImGui.Begin("##fhsetup", flags)) {
             ImGui.End();
             return;
@@ -294,7 +296,8 @@ internal sealed unsafe class FhSetupUi : IDisposable {
     private void _draw_log() {
         FhLogLine[] lines = _setup.get_log();
 
-        ImGui.BeginChild("##log", new Vector2(-1, -1), ImGuiChildFlags.Borders);
+        float height = MathF.Max(ImGui.GetContentRegionAvail().Y, ImGui.GetTextLineHeightWithSpacing() * 6);
+        ImGui.BeginChild("##log", new Vector2(-1, height), ImGuiChildFlags.Borders);
         foreach (FhLogLine line in lines) {
             Vector4 color = line.level switch {
                 FhLogLevel.SUCCESS => _color_ok,
