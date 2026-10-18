@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- ASSEMBLY BASIC PROPERTIES -->
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <!-- ASSEMBLY ADDITIONAL PROPERTIES -->
+    <PropertyGroup>
+        <AssemblyName>fhsetup</AssemblyName>
+        <AssemblyTitle>Fahrenheit Setup</AssemblyTitle>
+        <Product>Fahrenheit Setup</Product>
+    </PropertyGroup>
+
+    <!--
+    PUBLISH SETTINGS
+
+    The setup tool checks for and installs the .NET runtime, so it must not require one itself.
+    Release builds therefore publish it with NativeAOT, as a self-contained native executable.
+
+    NativeAOT needs a native toolchain (MSVC on Windows, clang on Linux) and cannot cross-compile
+    between operating systems. It is enabled by default for Visual Studio MSBuild builds on Windows,
+    i.e. full builds and releases, which require MSVC anyway. `dotnet build` keeps working with just
+    the .NET SDK and produces a framework-dependent tool, like the other tools.
+
+    To build the Linux tool: `dotnet build -c Release -r linux-x64 -p:PublishAot=true`.
+    -->
+    <PropertyGroup>
+        <PublishAot Condition="'$(PublishAot)'=='' and '$(OS)'=='Windows_NT' and '$(MSBuildRuntimeType)'=='Full'">true</PublishAot>
+        <RuntimeIdentifier Condition="'$(RuntimeIdentifier)'=='' and '$(PublishAot)'=='true' and '$(OS)'=='Windows_NT'">win-x64</RuntimeIdentifier>
+        <!-- `dotnet publish` implies this for NativeAOT, but Fahrenheit publishes as part of the build. -->
+        <SelfContained Condition="'$(PublishAot)'=='true'">true</SelfContained>
+        <IsAotCompatible>true</IsAotCompatible>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    </PropertyGroup>
+
+    <!-- APPLICATION ASSETS -->
+    <PropertyGroup>
+        <ApplicationIcon>..\..\assets\fh_base_256.ico</ApplicationIcon>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+    </PropertyGroup>
+
+    <!-- SHARED FILE LINKS -->
+    <ItemGroup>
+        <None Include="$(SolutionDir).editorconfig" Link=".editorconfig" />
+    </ItemGroup>
+
+    <!-- EXTERNAL PROJECT REFS -->
+    <ItemGroup>
+        <PackageReference Include="Hexa.NET.ImGui.Backends" Version="3.1.0-experimental" />
+        <PackageReference Include="Hexa.NET.ImGui.Backends.SDL3" Version="3.1.0-experimental" />
+        <PackageReference Include="Hexa.NET.SDL3" Version="1.2.11" />
+        <PackageReference Include="Hexa.NET.OpenGL3" Version="1.1.0" />
+    </ItemGroup>
+
+</Project>

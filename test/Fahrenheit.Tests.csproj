@@ -35,6 +35,14 @@
         <ProjectReference Include="..\src\core\Fahrenheit.csproj" />
     </ItemGroup>
 
+    <!--
+    The setup tool is a NativeAOT executable and cannot be referenced like a library.
+    Its platform-independent logic is compiled into the test suite instead.
+    -->
+    <ItemGroup>
+        <Compile Include="..\src\setup\core\*.cs" LinkBase="setup\core" />
+    </ItemGroup>
+
     <!-- EXTERNAL PROJECT REFS -->
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="10.0.1">
