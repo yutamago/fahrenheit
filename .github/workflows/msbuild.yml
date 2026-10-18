@@ -56,3 +56,49 @@ jobs:
       working-directory: ${{ env.GITHUB_WORKSPACE }}
       # Force deterministic build per https://github.com/clairernovotny/DeterministicBuilds
       run: msbuild /m /p:ContinuousIntegrationBuild=true /p:Configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.SOLUTION_FILE_PATH }}
+
+      # fhsetup must be a NativeAOT executable, as it installs the .NET runtime other tools depend on.
+    - name: Check that fhsetup was built with NativeAOT
+      shell: pwsh
+      run: |
+        $bin = "artifacts\deploy\${{ env.BUILD_CONFIGURATION == 'release' && 'rel' || 'dbg' }}\bin"
+        if (-not (Test-Path "$bin\fhsetup.exe")) { throw "fhsetup.exe is missing." }
+        if (Test-Path "$bin\fhsetup.dll")        { throw "fhsetup was built framework-dependent, not with NativeAOT." }
+
+      # Unsigned build output, for testing pull requests without building them locally.
+    - name: Upload build output
+      uses: actions/upload-artifact@v4
+      with:
+        name: fahrenheit-${{ env.BUILD_CONFIGURATION }}-${{ github.sha }}
+        path: artifacts/deploy/${{ env.BUILD_CONFIGURATION == 'release' && 'rel' || 'dbg' }}/
+
+  # NativeAOT cannot cross-compile between operating systems, so the Linux setup tool is built here.
+  # ci-release.ps1 downloads this artifact and adds it to the release.
+  linux:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Test
+      run: dotnet test -c Release test/Fahrenheit.Tests.csproj
+
+    - name: Build fhsetup (linux-x64, NativeAOT)
+      run: >
+        dotnet build -c Release -r linux-x64
+        -p:PublishAot=true -p:ContinuousIntegrationBuild=true -p:PublishDir=${{ github.workspace }}/out/fhsetup/
+        src/setup/Fahrenheit.Tools.Setup.csproj
+
+    - name: Upload fhsetup
+      uses: actions/upload-artifact@v4
+      with:
+        name: fhsetup-linux-x64
+        path: |
+          out/fhsetup/
+          !out/fhsetup/*.dbg

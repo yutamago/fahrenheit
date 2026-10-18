@@ -110,6 +110,22 @@ try {
     $ArtifactsToSign = Get-ChildItem -Path $DirArtifactsBin -Recurse -Include "fh*.dll", "fh*.exe"
     signtool sign /sha1 $certFingerprint /tr http://time.certum.pl /fd sha1 /td sha256 /v $ArtifactsToSign
     
+    <#
+        The Linux setup tool must be built with NativeAOT on Linux, which CI does (see msbuild.yml).
+        Fetch it from the CI run of the commit being released. Linux binaries are not Authenticode-signed.
+    #>
+    $Commit = git rev-parse HEAD
+    $RunId  = gh run list --workflow msbuild.yml --commit $Commit --status success --limit 1 --json databaseId --jq ".[0].databaseId"
+
+    if (-not $RunId) {
+        throw "No successful CI run found for commit $Commit. Push it and wait for CI to finish before releasing."
+    }
+
+    gh run download $RunId --name fhsetup-linux-x64 --dir $DirArtifactsBin
+    if ($LASTEXITCODE -ne 0) {
+        throw "Could not download the Linux setup tool from CI run $RunId."
+    }
+
     # ZIP up the signed release artifacts.
     7z a -tzip "fahrenheit_$($configuration)_$($tag).zip" $Artifacts
     
