@@ -458,3 +458,6 @@ Properties/
 *.sln.iml
 
 ##### FAHRENHEIT SPECIFIC END
+
+# Local, uncommitted Claude Code instructions
+CLAUDE.local.md
