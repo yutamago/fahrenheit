@@ -129,14 +129,23 @@ try {
 
     # ZIP up the signed release artifacts.
     7z a -tzip "fahrenheit_$($configuration)_$($tag).zip" $Artifacts
+
+    <#
+        Players download the setup tool on its own, from the links in README.md.
+        Asset names come from file names, so the Linux tool is copied to its published name.
+    #>
+    $DirStandalone = Join-Path -Path $DirArtifacts -ChildPath "standalone"
+    Create-Directory -Path $DirStandalone
+    Copy-Item -Path (Join-Path $DirArtifactsSetup "fhsetup.exe") -Destination (Join-Path $DirStandalone "fhsetup.exe")   -Force
+    Copy-Item -Path (Join-Path $DirArtifactsSetup "fhsetup")     -Destination (Join-Path $DirStandalone "fhsetup-linux") -Force
     
     if ($dryRun) {
         Write-Host "Dry run complete. Exiting."
         exit 0
     }
     
-    # Attach the generated release ZIP to the appropriate GH tag.
-    gh release upload $tag "fahrenheit_$($configuration)_$($tag).zip"
+    # Attach the generated release ZIP and the standalone setup tools to the appropriate GH tag.
+    gh release upload $tag "fahrenheit_$($configuration)_$($tag).zip" (Join-Path $DirStandalone "fhsetup.exe") (Join-Path $DirStandalone "fhsetup-linux")
     
     # Push the NuGet packages.
     # They are currently not signed pending a support thread with Certum wrt. inability to sign SHA-256.

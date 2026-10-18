@@ -20,14 +20,17 @@ internal sealed unsafe partial class Program {
     private static GL?          _gl_context;
 
     private static int Main(string[] args) {
-        FhSetup setup = new(FhSetupPlatform.create(), AppContext.BaseDirectory);
+        FhSetup setup = new(FhSetupPlatform.create(), AppContext.BaseDirectory, Environment.ProcessPath);
 
         if (args.Length > 0) {
             if (OperatingSystem.IsWindows()) _attach_parent_console();
             return FhSetupCli.run(setup, args);
         }
 
+        FhEmbeddedFiles.initialize();
+
         setup.detect();
+        _ = Task.Run(() => setup.check_latest_release());
         return _run_window(setup);
     }
 
@@ -54,7 +57,7 @@ internal sealed unsafe partial class Program {
         _sdl_window = SDL.CreateWindow(
             "Fahrenheit Setup",
             int.CreateChecked(MathF.Round(820 * main_display_scale)),
-            int.CreateChecked(MathF.Round(760 * main_display_scale)),
+            int.CreateChecked(MathF.Round(940 * main_display_scale)),
             window_flags);
 
         if (_sdl_window == null) {
@@ -90,8 +93,9 @@ internal sealed unsafe partial class Program {
         style.FontScaleDpi = main_display_scale;
         io.ConfigDpiScaleFonts = true;
 
-        // The runtime ships the Noto Sans font; it reads much better than ImGui's default bitmap font.
-        string font_path = Path.Join(setup.bin_dir, "resources", "fonts", "NotoSans-Regular.ttf");
+        // Noto Sans reads much better than ImGui's default bitmap font. Release builds embed it.
+        // Otherwise, use the copy the runtime ships, if Fahrenheit is installed.
+        string font_path = FhEmbeddedFiles.font_path ?? Path.Join(setup.bin_dir, "resources", "fonts", "NotoSans-Regular.ttf");
         if (File.Exists(font_path)) io.Fonts.AddFontFromFileTTF(font_path, 18f);
 
         ImGuiImplSDL3.SetCurrentContext(ctx);

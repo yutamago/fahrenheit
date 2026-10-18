@@ -29,15 +29,28 @@ internal sealed class FhSetup {
     public readonly IFhSetupPlatform platform;
 
     /// <summary>
-    ///     The Fahrenheit installation directory: the parent of the <c>setup</c> folder this tool runs from.
+    ///     The running executable. An update that replaces it renames it out of the way.
     /// </summary>
-    public readonly string install_dir;
-    public readonly string bin_dir;
+    public readonly string? tool_path;
 
-    public readonly List<FhSteamGame>         detected_games = [];
-    public readonly List<FhShortcutLocation>  shortcut_locations;
-    public readonly bool[]                    location_enabled;
-    public readonly bool[]                    entry_enabled;
+    /// <summary>
+    ///     The Fahrenheit installation directory. Fahrenheit may not be installed in it yet.
+    /// </summary>
+    public string           install_dir  { get; private set; } = "";
+    public string           bin_dir      { get; private set; } = "";
+    public FhInstallDirInfo install_info { get; private set; } = FhInstaller.inspect("");
+
+    /// <summary>
+    ///     The newest release on GitHub, once <see cref="check_latest_release"/> has found it.
+    /// </summary>
+    public FhRelease? latest_release       { get; private set; }
+    public string?    latest_release_error { get; private set; }
+    public bool       latest_release_known { get; private set; }
+
+    public readonly List<FhSteamGame> detected_games = [];
+    public List<FhShortcutLocation>   shortcut_locations { get; private set; } = [];
+    public bool[]                     location_enabled   { get; private set; } = [];
+    public readonly bool[]            entry_enabled;
 
     public string          game_dir        { get; private set; } = "";
     public FhGameDirSource game_dir_source { get; private set; }
@@ -54,21 +67,132 @@ internal sealed class FhSetup {
     private volatile string _busy_status = "";
     private          float  _busy_progress = -1f;
 
-    public FhSetup(IFhSetupPlatform platform, string setup_dir) {
-        this.platform    = platform;
-        this.install_dir = Directory.GetParent(Path.TrimEndingDirectorySeparator(Path.GetFullPath(setup_dir)))!.FullName;
-        this.bin_dir     = Path.Join(install_dir, "bin");
+    /// <param name="tool_dir">The folder this tool runs from. If it is an installation's <c>setup</c> folder, that installation is selected.</param>
+    public FhSetup(IFhSetupPlatform platform, string tool_dir, string? tool_path) {
+        this.platform  = platform;
+        this.tool_path = tool_path;
+        entry_enabled  = Array.ConvertAll(FhLaunch.entries, _ => true);
 
-        shortcut_locations = platform.get_shortcut_locations(install_dir);
-        location_enabled   = shortcut_locations.Select(location => location.enabled_by_default).ToArray();
-        entry_enabled      = Array.ConvertAll(FhLaunch.entries, _ => true);
+        select_install_dir(FhInstaller.find_install_of_tool(tool_dir) ?? FhInstaller.get_default_install_dir());
+        FhInstaller.remove_leftovers(Path.Join(install_dir, FhInstaller.SETUP_DIR_NAME));
     }
 
     /// <summary>
-    ///     Whether this tool runs from a Fahrenheit installation, i.e. next to its <c>bin</c> folder.
+    ///     Whether <see cref="install_dir"/> holds a Fahrenheit installation.
     /// </summary>
-    public bool is_in_install_dir {
-        get { return File.Exists(Path.Join(bin_dir, FhLaunch.STAGE0_EXE_NAME)); }
+    public bool is_installed {
+        get { return install_info.state == FhInstallDirState.FAHRENHEIT; }
+    }
+
+    /// <summary>
+    ///     Whether the installation is older than the latest release, or its version is unknown.
+    /// </summary>
+    public bool is_update_available {
+        get { return is_installed && latest_release != null && install_info.version != latest_release.version; }
+    }
+
+    public void select_install_dir(string path) {
+        install_info = FhInstaller.inspect(path);
+        install_dir  = install_info.path;
+        bin_dir      = Path.Join(install_dir, FhInstaller.BIN_DIR_NAME);
+
+        // Keep the user's choice of shortcut locations. Only the installation folder's own location moves.
+        Dictionary<string, bool> enabled = new();
+        for (int i = 0; i < shortcut_locations.Count; i++) enabled[shortcut_locations[i].id] = location_enabled[i];
+
+        shortcut_locations = platform.get_shortcut_locations(install_dir);
+        location_enabled   = shortcut_locations.Select(location => enabled.GetValueOrDefault(location.id, location.enabled_by_default)).ToArray();
+    }
+
+    /// <summary>
+    ///     Asks GitHub for the newest release.
+    /// </summary>
+    public async Task check_latest_release(CancellationToken token = default) {
+        try {
+            string json    = await FhDownloader.get_string(FhReleases.releases_api, FhReleases.is_trusted, token);
+            latest_release = FhReleases.parse_latest(json);
+            latest_release_error = latest_release == null ? "No Fahrenheit release was found on GitHub." : null;
+        }
+        catch (Exception e) when (e is not OperationCanceledException) {
+            latest_release_error = $"Could not check for the latest release: {e.Message}";
+        }
+        finally {
+            latest_release_known = true;
+        }
+    }
+
+    /// <summary>
+    ///     Explains why Fahrenheit cannot be installed into <see cref="install_dir"/>, or returns <see langword="null"/> if it can.
+    /// </summary>
+    public string? install_dir_blocker {
+        get {
+            return install_info.state switch {
+                FhInstallDirState.GAME  => "Fahrenheit must be installed outside the game folder.",
+                FhInstallDirState.OTHER => "This folder contains other files. Choose an empty folder, or an existing Fahrenheit installation.",
+                _                       => null,
+            };
+        }
+    }
+
+    /// <summary>
+    ///     Installs the latest release into <see cref="install_dir"/>, or updates the installation there.
+    ///     With <paramref name="local_zip"/>, installs that release ZIP instead of downloading one.
+    /// </summary>
+    public async Task<bool> install_release(string? local_zip = null, CancellationToken token = default) {
+        if (_busy) return false;
+        _busy = true;
+
+        try {
+            if (install_dir_blocker != null) {
+                log(FhLogLevel.ERROR, install_dir_blocker);
+                return false;
+            }
+
+            string zip = local_zip ?? "";
+            string label;
+
+            if (local_zip == null) {
+                if (latest_release == null) {
+                    log(FhLogLevel.ERROR, latest_release_error ?? "The latest release is not known yet.");
+                    return false;
+                }
+
+                label        = $"Fahrenheit {latest_release.tag}";
+                _busy_status = $"Downloading {label}...";
+                Volatile.Write(ref _busy_progress, 0f);
+                log(FhLogLevel.INFO, _busy_status);
+
+                if (latest_release.sha256 == null) log(FhLogLevel.INFO, "GitHub reported no checksum for this release, so the download cannot be verified.");
+
+                zip = await FhDownloader.download_file(
+                    new Uri(latest_release.zip_url), FhReleases.is_trusted, _download_dir,
+                    latest_release.zip_name, latest_release.sha256, p => Volatile.Write(ref _busy_progress, p), token);
+            }
+            else {
+                label = Path.GetFileName(local_zip);
+            }
+
+            bool updating = is_installed;
+            _busy_status  = updating ? $"Updating to {label}..." : $"Installing {label}...";
+            Volatile.Write(ref _busy_progress, -1f);
+            log(FhLogLevel.INFO, _busy_status);
+
+            await Task.Run(() => FhInstaller.install(zip, install_dir, tool_path), token);
+            if (local_zip == null) File.Delete(zip);
+
+            select_install_dir(install_dir);
+            log(FhLogLevel.SUCCESS, updating ? $"Updated {install_dir} to {label}." : $"Installed {label} into {install_dir}.");
+            return ensure_load_order();
+        }
+        catch (Exception e) when (e is not OperationCanceledException) {
+            log(FhLogLevel.ERROR, $"Could not install Fahrenheit: {e.Message}");
+            select_install_dir(install_dir);
+            return false;
+        }
+        finally {
+            _busy_status = "";
+            _busy        = false;
+        }
     }
 
     public bool is_busy {
@@ -148,7 +272,6 @@ internal sealed class FhSetup {
         _busy = true;
 
         try {
-            string download_dir = Path.Join(install_dir, "cache", "setup");
 
             foreach (FhPrereqStatus status in missing_prereqs) {
                 FhPrereqInfo info = FhPrereqs.get(status.kind);
@@ -159,7 +282,7 @@ internal sealed class FhSetup {
 
                 string installer;
                 try {
-                    installer = await FhDownloader.download(info, download_dir, p => Volatile.Write(ref _busy_progress, p), token);
+                    installer = await FhDownloader.download(info, _download_dir, p => Volatile.Write(ref _busy_progress, p), token);
                     platform.verify_installer(installer);
                 }
                 catch (Exception e) when (e is not OperationCanceledException) {
@@ -204,6 +327,11 @@ internal sealed class FhSetup {
     ///     Returns whether everything succeeded.
     /// </summary>
     public bool finish() {
+        if (!is_installed) {
+            log(FhLogLevel.ERROR, "Install Fahrenheit first.");
+            return false;
+        }
+
         if (!game_info.is_valid) {
             log(FhLogLevel.ERROR, "Select a valid game folder first.");
             return false;
@@ -253,6 +381,14 @@ internal sealed class FhSetup {
             log(FhLogLevel.ERROR, $"Could not create {path}: {e.Message}");
             return false;
         }
+    }
+
+    /// <summary>
+    ///     Downloads go to a temporary folder, never into the installation folder: a failed download would
+    ///     otherwise leave files behind that make an empty folder look like it holds something else.
+    /// </summary>
+    private static string _download_dir {
+        get { return Path.Join(Path.GetTempPath(), "fhsetup-downloads"); }
     }
 
     private static bool _same_path(string a, string b) {

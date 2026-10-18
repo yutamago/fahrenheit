@@ -73,7 +73,7 @@ public static class FhLaunch {
 
     /// <summary>
     ///     Maps an absolute Unix path to the path a Wine/Proton process sees, through Wine's <c>Z:</c> drive,
-    ///     which maps the Unix root directory. Forward slashes are kept; Windows accepts both separators.
+    ///     which maps the Unix root directory. Forward slashes are kept, since Windows accepts both separators.
     /// </summary>
     public static string to_wine_path(string unix_path) {
         if (!unix_path.StartsWith('/')) throw new ArgumentException($"'{unix_path}' is not an absolute Unix path.", nameof(unix_path));

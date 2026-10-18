@@ -11,17 +11,16 @@ It is also the leading repository of knowledge about the games, underpinning oth
 This know-how is free for you to use, learn from, analyze, and improve.
 
 ## Here just to play?
-1. Download the latest release from the [releases page](https://github.com/fahrenheit-crew/fahrenheit/releases)
-   and extract it into a new folder, **outside** the game folder.
-2. Run `setup/fhsetup.exe`. It finds the game in your Steam library, installs anything missing
-   (.NET, Visual C++ Redistributable) and creates shortcuts that start the game with Fahrenheit.
-   - On Linux and Steam Deck, run `setup/fhsetup` instead. ZIP files do not keep the executable flag, so allow it
-     to run first (right-click > *Properties* > *Permissions* > *Is executable*, or `chmod +x setup/fhsetup`).
-     It also needs [Protontricks](https://github.com/Matoking/protontricks), which Steam Deck users can get from the Discover store.
-3. Start the game with one of those shortcuts.
+Download **[fhsetup.exe](https://github.com/fahrenheit-crew/fahrenheit/releases/latest/download/fhsetup.exe)** and run it.
+It installs Fahrenheit, finds the game in your Steam library, installs anything missing (.NET, Visual C++ Redistributable)
+and creates shortcuts that start the game with Fahrenheit. Run it again later to update Fahrenheit.
+
+On Linux and Steam Deck, download **[fhsetup-linux](https://github.com/fahrenheit-crew/fahrenheit/releases/latest/download/fhsetup-linux)** instead.
+Browsers do not keep the executable flag, so allow it to run first (right-click > *Properties* > *Permissions* > *Is executable*,
+or `chmod +x fhsetup-linux`). It also needs [Protontricks](https://github.com/Matoking/protontricks), which Steam Deck users can get from the Discover store.
 
 The [installation guide](https://github.com/fahrenheit-crew/fahrenheit/wiki/Installation-guide) describes the manual steps,
-and how to update or uninstall.
+and how to uninstall.
 
 ## For developers
 Follow the [build, deployment and debugging guide](https://github.com/fahrenheit-crew/fahrenheit/wiki/Build-and-deployment-guide) (or `BUILD.md` locally).
@@ -30,7 +29,7 @@ Follow the [build, deployment and debugging guide](https://github.com/fahrenheit
 [![Fahrenheit.Sdk on NuGet](https://img.shields.io/nuget/vpre/Fahrenheit.Sdk?label=Fahrenheit.Sdk)](https://www.nuget.org/packages/Fahrenheit.Sdk)
 
 Mods are .NET projects built on the [`Fahrenheit.Sdk`](https://www.nuget.org/packages/Fahrenheit.Sdk) package from NuGet.
-There is nothing to install by hand; name the SDK and the Fahrenheit version you target in your project file:
+There is nothing to install by hand. Name the SDK and the Fahrenheit version you target in your project file:
 
 ```xml
 <Project Sdk="Fahrenheit.Sdk/1.0.0-alpha12">

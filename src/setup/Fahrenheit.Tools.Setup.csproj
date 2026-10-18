@@ -42,12 +42,30 @@
 
     <!--
     The tool is published into its own `setup` folder, not `bin`. Its native libraries (SDL3, cimgui, ...)
-    are 64-bit and share names with the 32-bit ones Fahrenheit loads into the game; the in-game loader
+    are 64-bit and share names with the 32-bit ones Fahrenheit loads into the game. The in-game loader
     probes `bin` first, so copies there break Fahrenheit (it fails to load cimgui and the game exits).
     -->
     <PropertyGroup>
         <PublishDir>$([MSBuild]::NormalizeDirectory('$(_FhOutDir)', 'setup'))</PublishDir>
     </PropertyGroup>
+
+    <!--
+    SINGLE-FILE EMBEDDING
+
+    Players download the NativeAOT tool on its own, so it must be a single file. The native libraries of
+    the UI (SDL3, cimgui, the ImGui backends) and its font are embedded instead of copied next to it.
+    At startup they are written to a per-user cache folder and loaded from there (see natives.cs).
+    -->
+    <ItemGroup Condition="'$(PublishAot)'=='true'">
+        <EmbeddedResource Include="..\..\assets\NotoSans-Regular.ttf" LogicalName="font/NotoSans-Regular.ttf" WithCulture="false" />
+    </ItemGroup>
+
+    <Target Name="__FhEmbedNativeLibraries" AfterTargets="ResolvePackageAssets" Condition="'$(PublishAot)'=='true'">
+        <ItemGroup>
+            <EmbeddedResource Include="@(NativeCopyLocalItems)" LogicalName="native/%(Filename)%(Extension)" WithCulture="false" />
+            <NativeCopyLocalItems Remove="@(NativeCopyLocalItems)" />
+        </ItemGroup>
+    </Target>
 
     <!-- APPLICATION ASSETS -->
     <PropertyGroup>

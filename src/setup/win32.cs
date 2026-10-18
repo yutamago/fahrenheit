@@ -34,7 +34,7 @@ internal static unsafe partial class FhShellLink {
     ///     Writes a shell link to <paramref name="lnk_path"/>, replacing any existing file.
     /// </summary>
     public static void save(FhShellLinkInfo info, string lnk_path) {
-        // S_FALSE (already initialized) and RPC_E_CHANGED_MODE (initialized as MTA) are both fine; the shell link supports either.
+        // S_FALSE (already initialized) and RPC_E_CHANGED_MODE (initialized as MTA) are both fine, since the shell link supports either.
         _ = CoInitializeEx(null, _coinit_apartmentthreaded);
 
         Marshal.ThrowExceptionForHR(CoCreateInstance(_clsid_shell_link, null, _clsctx_inproc_server, _iid_iunknown, out void* unknown));
@@ -86,7 +86,7 @@ internal unsafe partial interface IShellLinkW {
 
 /// <summary>
 ///     https://learn.microsoft.com/en-us/windows/win32/api/objidl/nn-objidl-ipersistfile
-///     <c>GetClassID</c> is inherited from <c>IPersist</c>; it is declared here to keep the vtable layout.
+///     <c>GetClassID</c> is inherited from <c>IPersist</c>. It is declared here to keep the vtable layout.
 /// </summary>
 [GeneratedComInterface(StringMarshalling = StringMarshalling.Utf16)]
 [Guid("0000010b-0000-0000-C000-000000000046")]

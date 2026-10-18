@@ -35,10 +35,7 @@
         <ProjectReference Include="..\src\core\Fahrenheit.csproj" />
     </ItemGroup>
 
-    <!--
-    The setup tool is a NativeAOT executable and cannot be referenced like a library.
-    Its platform-independent logic is compiled into the test suite instead.
-    -->
+    <!-- SETUP TOOL SOURCES -->
     <ItemGroup>
         <Compile Include="..\src\setup\core\*.cs" LinkBase="setup\core" />
     </ItemGroup>

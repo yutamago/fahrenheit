@@ -15,7 +15,11 @@ internal static class FhSetupCli {
         Without options, opens the setup window.
 
         Options:
-          --check                       Print the detected game folder and the prerequisite status.
+          --check                       Print the installation, game folder and prerequisite status.
+          --install-dir <path>          Use this Fahrenheit installation folder. Default: the installation
+                                        this tool is part of, otherwise a "Fahrenheit" folder in your home folder.
+          --install                     Install the latest release from GitHub, or update to it.
+          --install-zip <path>          Install or update from a downloaded release ZIP instead.
           --game-dir <path>             Use this game folder instead of the one found in Steam.
           --install-prereqs             Download and install missing prerequisites.
           --create-shortcuts [ids]      Create shortcuts in the given comma-separated locations
@@ -31,11 +35,21 @@ internal static class FhSetupCli {
         bool    create_shortcuts = false;
         string? locations        = null;
         string? game_dir         = null;
+        string? install_dir      = null;
+        bool    install          = false;
+        string? install_zip      = null;
 
         for (int i = 0; i < args.Length; i++) {
             switch (args[i]) {
                 case "--check":           check           = true; break;
                 case "--install-prereqs": install_prereqs = true; break;
+                case "--install":         install         = true; break;
+                case "--install-dir" when i + 1 < args.Length:
+                    install_dir = args[++i];
+                    break;
+                case "--install-zip" when i + 1 < args.Length:
+                    install_zip = args[++i];
+                    break;
                 case "--game-dir" when i + 1 < args.Length:
                     game_dir = args[++i];
                     break;
@@ -53,10 +67,18 @@ internal static class FhSetupCli {
             }
         }
 
+        if (install_dir != null) setup.select_install_dir(install_dir);
+
         setup.detect();
         if (game_dir != null) setup.set_game_dir(game_dir, FhGameDirSource.USER);
 
         bool ok = true;
+
+        if (install || check) setup.check_latest_release().GetAwaiter().GetResult();
+
+        if (install_zip != null || install) {
+            ok &= setup.install_release(install_zip).GetAwaiter().GetResult();
+        }
 
         if (install_prereqs) {
             if (setup.install_blocker != null) {
@@ -79,19 +101,27 @@ internal static class FhSetupCli {
             ok &= setup.finish();
         }
 
-        if (check || install_prereqs || create_shortcuts) print_status(setup);
+        if (check || install || install_zip != null || install_prereqs || create_shortcuts) print_status(setup);
 
         foreach (FhLogLine line in setup.get_log()) {
             (line.level == FhLogLevel.ERROR ? Console.Error : Console.Out).WriteLine($"[{line.level}] {line.text}");
         }
 
-        ok &= setup.game_info.is_valid && setup.missing_prereqs.Length == 0;
+        ok &= setup.is_installed && setup.game_info.is_valid && setup.missing_prereqs.Length == 0;
         return ok ? 0 : 1;
     }
 
     private static void print_status(FhSetup setup) {
         Console.WriteLine($"Platform:      {setup.platform.name}");
-        Console.WriteLine($"Fahrenheit:    {setup.install_dir}{(setup.is_in_install_dir ? "" : " (bin\\fhstage0.exe not found!)")}");
+        string installed = setup.install_info.state switch {
+            FhInstallDirState.FAHRENHEIT => $"installed, version {setup.install_info.version ?? "unknown"}",
+            FhInstallDirState.EMPTY      => "not installed",
+            _                            => setup.install_dir_blocker!,
+        };
+        string latest = setup.latest_release?.tag ?? setup.latest_release_error ?? "not checked";
+
+        Console.WriteLine($"Fahrenheit:    {setup.install_dir} ({installed})");
+        Console.WriteLine($"Latest:        {latest}");
         Console.WriteLine($"Game folder:   {(setup.game_dir.Length == 0 ? "(not found)" : setup.game_dir)} [{setup.game_dir_source}, {(setup.game_info.is_valid ? "valid" : "invalid")}]");
 
         foreach (FhPrereqStatus status in setup.prereqs) {

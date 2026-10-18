@@ -81,7 +81,7 @@ internal sealed class FhWindowsPlatform : IFhSetupPlatform {
     public void verify_installer(string installer_path) {
         FhWinTrust.verify_authenticode(installer_path);
 
-        // A valid signature alone is not enough; it must also be Microsoft's.
+        // A valid signature alone is not enough. It must also be Microsoft's.
         // X509CertificateLoader has no equivalent for reading the signer of an Authenticode-signed file.
 #pragma warning disable SYSLIB0057
         using X509Certificate  signed = X509Certificate.CreateFromSignedFile(installer_path);
@@ -116,7 +116,7 @@ internal sealed class FhWindowsPlatform : IFhSetupPlatform {
     }
 
     /// <summary>
-    ///     Both installers are WiX Burn bundles and report standard Windows Installer exit codes.
+    ///     The .NET and Visual C++ installers report the standard Windows Installer exit codes.
     /// </summary>
     private static string? _describe_installer_exit_code(int exit_code) {
         return exit_code switch {

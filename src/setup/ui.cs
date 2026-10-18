@@ -13,7 +13,15 @@ internal enum FhStatusIcon {
 }
 
 /// <summary>
-///     The setup window: one page with three steps (game folder, prerequisites, shortcuts) and a log.
+///     Which path field a folder dialog fills in.
+/// </summary>
+internal enum FhPathField {
+    INSTALL_DIR,
+    GAME_DIR,
+}
+
+/// <summary>
+///     The setup window: one page with four steps (Fahrenheit, game folder, prerequisites, shortcuts) and a log.
 /// </summary>
 internal sealed unsafe class FhSetupUi : IDisposable {
     private const int _path_buffer_size = 4096;
@@ -26,23 +34,28 @@ internal sealed unsafe class FhSetupUi : IDisposable {
 
     private readonly FhSetup    _setup;
     private readonly SDLWindow* _window;
-    private readonly byte*      _path_buffer;
+    private readonly byte*      _install_dir_buffer;
+    private readonly byte*      _game_dir_buffer;
 
-    // The folder dialog may report its result from another thread; it is handed over through this field.
+    // The folder dialog may report its result from another thread. It is handed over through this field.
     private static string?                        _picked_dir;
+    private static FhPathField                    _picked_field;
     private static readonly SDLDialogFileCallback _on_folder_picked = _folder_picked;
 
     private int _log_count_seen;
 
     public FhSetupUi(FhSetup setup, SDLWindow* window) {
-        _setup       = setup;
-        _window      = window;
-        _path_buffer = (byte*)NativeMemory.AllocZeroed(_path_buffer_size);
-        _write_path_buffer(setup.game_dir);
+        _setup              = setup;
+        _window             = window;
+        _install_dir_buffer = (byte*)NativeMemory.AllocZeroed(_path_buffer_size);
+        _game_dir_buffer    = (byte*)NativeMemory.AllocZeroed(_path_buffer_size);
+        _write_path_buffer(_install_dir_buffer, setup.install_dir);
+        _write_path_buffer(_game_dir_buffer,    setup.game_dir);
     }
 
     public void Dispose() {
-        NativeMemory.Free(_path_buffer);
+        NativeMemory.Free(_install_dir_buffer);
+        NativeMemory.Free(_game_dir_buffer);
     }
 
     public static void apply_style(ImGuiStylePtr style) {
@@ -72,12 +85,10 @@ internal sealed unsafe class FhSetupUi : IDisposable {
         ImGui.PushFont(ImGui.GetFont(), ImGui.GetFontSize() * 1.4f);
         ImGui.Text("Fahrenheit Setup");
         ImGui.PopFont();
-        ImGui.TextColored(_color_muted, $"Prepares Fahrenheit to run on {_setup.platform.name}. Installed in: {_setup.install_dir}");
+        ImGui.TextColored(_color_muted, $"Installs Fahrenheit and prepares it to run on {_setup.platform.name}.");
 
-        if (!_setup.is_in_install_dir) {
-            _status_line(FhStatusIcon.WARNING, $"{FhLaunch.STAGE0_EXE_NAME} was not found in the 'bin' folder. Run it from the 'setup' folder of a Fahrenheit release.");
-        }
-
+        ImGui.Spacing();
+        _draw_install();
         ImGui.Spacing();
         _draw_game_dir();
         ImGui.Spacing();
@@ -85,25 +96,67 @@ internal sealed unsafe class FhSetupUi : IDisposable {
         ImGui.Spacing();
         _draw_shortcuts();
         ImGui.Spacing();
+        _draw_busy();
         _draw_log();
 
         ImGui.End();
     }
 
-    private void _draw_game_dir() {
-        ImGui.SeparatorText("1. Game folder");
-        ImGui.TextWrapped("The folder of FINAL FANTASY X/X-2 HD Remaster, which contains FFX.exe and FFX-2.exe.");
+    private void _draw_install() {
+        ImGui.SeparatorText("1. Fahrenheit");
+        ImGui.TextWrapped("The folder Fahrenheit is installed in. Your mods, settings and saves are kept there too.");
 
-        float browse_width = ImGui.CalcTextSize("Browse...").X + ImGui.GetStyle().FramePadding.X * 2;
-        ImGui.SetNextItemWidth(-browse_width - ImGui.GetStyle().ItemSpacing.X);
-        if (ImGui.InputText("##game_dir", _path_buffer, _path_buffer_size)) {
-            _setup.set_game_dir(_read_path_buffer(), FhGameDirSource.USER);
+        if (_path_input("##install_dir", _install_dir_buffer, FhPathField.INSTALL_DIR)) {
+            _setup.select_install_dir(_read_path_buffer(_install_dir_buffer));
         }
 
-        ImGui.SameLine();
-        ImGui.BeginDisabled(_setup.is_busy);
-        if (ImGui.Button("Browse...")) _open_folder_dialog();
+        FhInstallDirInfo info   = _setup.install_info;
+        FhRelease?       latest = _setup.latest_release;
+
+        if (_setup.install_dir_blocker != null) {
+            _status_line(FhStatusIcon.ERROR, _setup.install_dir_blocker);
+        }
+        else if (info.state == FhInstallDirState.FAHRENHEIT) {
+            string version = info.version ?? "of an unknown version";
+            if (_setup.is_update_available) _status_line(FhStatusIcon.WARNING, $"Fahrenheit {version} is installed. Version {latest!.version} is available.");
+            else if (latest != null)        _status_line(FhStatusIcon.OK,      $"Fahrenheit {version} is installed and up to date.");
+            else                            _status_line(FhStatusIcon.OK,      $"Fahrenheit {version} is installed.");
+        }
+        else {
+            _status_line(FhStatusIcon.PENDING, "Fahrenheit will be installed into this folder.");
+        }
+
+        if (!_setup.latest_release_known) {
+            _status_line(FhStatusIcon.PENDING, "Checking GitHub for the latest release...");
+        }
+        else if (_setup.latest_release_error != null) {
+            _status_line(FhStatusIcon.ERROR, _setup.latest_release_error);
+        }
+
+        bool needs_install = !_setup.is_installed || _setup.is_update_available;
+        if (!needs_install || latest == null) return;
+
+        bool can_install = _setup.install_dir_blocker == null && !_setup.is_busy;
+        ImGui.BeginDisabled(!can_install);
+        if (ImGui.Button(_setup.is_installed ? $"Update to {latest.tag}" : $"Install Fahrenheit {latest.tag}")) {
+            _ = Task.Run(() => _setup.install_release());
+        }
         ImGui.EndDisabled();
+
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) && can_install) {
+            ImGui.SetTooltip(_setup.is_installed
+                ? "Replaces the 'bin' and 'setup' folders. Your mods, settings and saves are kept."
+                : "Downloads the release from GitHub and extracts it into this folder.");
+        }
+    }
+
+    private void _draw_game_dir() {
+        ImGui.SeparatorText("2. Game folder");
+        ImGui.TextWrapped("The folder of FINAL FANTASY X/X-2 HD Remaster, which contains FFX.exe and FFX-2.exe.");
+
+        if (_path_input("##game_dir", _game_dir_buffer, FhPathField.GAME_DIR)) {
+            _setup.set_game_dir(_read_path_buffer(_game_dir_buffer), FhGameDirSource.USER);
+        }
 
         FhGameDirInfo info = _setup.game_info;
 
@@ -135,7 +188,7 @@ internal sealed unsafe class FhSetupUi : IDisposable {
     }
 
     private void _draw_prereqs() {
-        ImGui.SeparatorText("2. Prerequisites");
+        ImGui.SeparatorText("3. Prerequisites");
 
         foreach (FhPrereqStatus status in _setup.prereqs) {
             FhPrereqInfo info = FhPrereqs.get(status.kind);
@@ -154,18 +207,12 @@ internal sealed unsafe class FhSetupUi : IDisposable {
             ImGui.TextColored(_color_muted, text);
         }
 
-        if (_setup.is_busy) {
-            float progress = _setup.busy_progress;
-            ImGui.ProgressBar(progress >= 0 ? progress : -1f * (float)ImGui.GetTime(), new Vector2(-1, 0), _setup.busy_status);
-            return;
-        }
-
         if (_setup.install_blocker != null) {
             _status_line(FhStatusIcon.WARNING, _setup.install_blocker);
         }
 
         int  missing     = _setup.missing_prereqs.Length;
-        bool can_install = missing > 0 && _setup.install_blocker == null;
+        bool can_install = missing > 0 && _setup.install_blocker == null && !_setup.is_busy;
 
         ImGui.BeginDisabled(!can_install);
         if (ImGui.Button(missing > 0 ? $"Install {missing} missing" : "Everything is installed")) {
@@ -182,7 +229,7 @@ internal sealed unsafe class FhSetupUi : IDisposable {
     }
 
     private void _draw_shortcuts() {
-        ImGui.SeparatorText("3. Shortcuts");
+        ImGui.SeparatorText("4. Shortcuts");
         ImGui.TextWrapped("Shortcuts start the game with Fahrenheit. Create them in:");
 
         for (int i = 0; i < _setup.shortcut_locations.Count; i++) {
@@ -199,12 +246,16 @@ internal sealed unsafe class FhSetupUi : IDisposable {
             ImGui.Checkbox($"{FhLaunch.entries[i].display_name}##entry{i}", ref _setup.entry_enabled[i]);
         }
 
-        bool can_finish = _setup.game_info.is_valid && _setup.shortcut_blocker == null && !_setup.is_busy;
+        bool can_finish = _setup.is_installed && _setup.game_info.is_valid && _setup.shortcut_blocker == null && !_setup.is_busy;
         ImGui.BeginDisabled(!can_finish);
         if (ImGui.Button("Create shortcuts")) _setup.finish();
         ImGui.EndDisabled();
 
-        if (_setup.shortcut_blocker != null) {
+        if (!_setup.is_installed) {
+            ImGui.SameLine();
+            ImGui.TextColored(_color_warning, "Install Fahrenheit first.");
+        }
+        else if (_setup.shortcut_blocker != null) {
             ImGui.SameLine();
             ImGui.TextColored(_color_warning, _setup.shortcut_blocker);
         }
@@ -212,6 +263,32 @@ internal sealed unsafe class FhSetupUi : IDisposable {
             ImGui.SameLine();
             ImGui.TextColored(_color_warning, "The game will not start with Fahrenheit until all prerequisites are installed.");
         }
+    }
+
+    private void _draw_busy() {
+        if (!_setup.is_busy) return;
+
+        float progress = _setup.busy_progress;
+        ImGui.ProgressBar(progress >= 0 ? progress : -1f * (float)ImGui.GetTime(), new Vector2(-1, 0), _setup.busy_status);
+    }
+
+    /// <summary>
+    ///     A path text field with a 'Browse...' button. Returns whether the user edited the text.
+    /// </summary>
+    private bool _path_input(string id, byte* buffer, FhPathField field) {
+        float browse_width = ImGui.CalcTextSize("Browse...").X + ImGui.GetStyle().FramePadding.X * 2;
+        ImGui.SetNextItemWidth(-browse_width - ImGui.GetStyle().ItemSpacing.X);
+
+        ImGui.BeginDisabled(_setup.is_busy);
+        bool edited = ImGui.InputText(id, buffer, _path_buffer_size);
+
+        ImGui.SameLine();
+        ImGui.PushID(id);
+        if (ImGui.Button("Browse...")) _open_folder_dialog(field, _read_path_buffer(buffer));
+        ImGui.PopID();
+        ImGui.EndDisabled();
+
+        return edited;
     }
 
     private void _draw_log() {
@@ -293,33 +370,42 @@ internal sealed unsafe class FhSetupUi : IDisposable {
 
     private void _set_game_dir(string path, FhGameDirSource source) {
         _setup.set_game_dir(path, source);
-        _write_path_buffer(path);
+        _write_path_buffer(_game_dir_buffer, path);
     }
 
-    private void _open_folder_dialog() {
-        // Pre-fill the dialog with the current folder, so the user sees where the detected game is.
-        string? start = Directory.Exists(_setup.game_dir) ? _setup.game_dir : null;
+    private void _set_install_dir(string path) {
+        _setup.select_install_dir(path);
+        _write_path_buffer(_install_dir_buffer, _setup.install_dir);
+    }
+
+    private void _open_folder_dialog(FhPathField field, string current) {
+        // Open the dialog at the current folder, so the user sees where the detected one is.
+        string? start = Directory.Exists(current) ? current : null;
+        _picked_field = field;
         SDL.ShowOpenFolderDialog(_on_folder_picked, null, _window, start, false);
     }
 
     private static void _folder_picked(void* userdata, byte** filelist, int filter) {
-        // A null list is an error; an empty list means the user cancelled.
+        // A null list is an error. An empty list means the user cancelled.
         if (filelist == null || filelist[0] == null) return;
         Volatile.Write(ref _picked_dir, Marshal.PtrToStringUTF8((nint)filelist[0]));
     }
 
     private void _consume_picked_dir() {
         string? picked = Interlocked.Exchange(ref _picked_dir, null);
-        if (picked != null) _set_game_dir(picked, FhGameDirSource.USER);
+        if (picked == null) return;
+
+        if (_picked_field == FhPathField.INSTALL_DIR) _set_install_dir(picked);
+        else                                          _set_game_dir(picked, FhGameDirSource.USER);
     }
 
-    private void _write_path_buffer(string path) {
-        Span<byte> buffer = new(_path_buffer, _path_buffer_size);
-        buffer.Clear();
-        Encoding.UTF8.GetBytes(path.AsSpan(), buffer[..^1]);
+    private static void _write_path_buffer(byte* buffer, string path) {
+        Span<byte> span = new(buffer, _path_buffer_size);
+        span.Clear();
+        Encoding.UTF8.GetBytes(path.AsSpan(), span[..^1]);
     }
 
-    private string _read_path_buffer() {
-        return Marshal.PtrToStringUTF8((nint)_path_buffer) ?? "";
+    private static string _read_path_buffer(byte* buffer) {
+        return Marshal.PtrToStringUTF8((nint)buffer) ?? "";
     }
 }

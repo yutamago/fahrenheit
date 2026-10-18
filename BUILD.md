@@ -50,5 +50,6 @@ To install/test your development build:
 - Add the mod IDs of mods you wish to load to `mods/loadorder`, each on their own line.
 - Start the game with a shortcut, or open a terminal in ``bin`` and issue ``.\fhstage0.exe {PATH_TO_GAME}\FFX.exe``.
   For Last Mission, issue ``.\fhstage0.exe {PATH_TO_GAME}\FFX-2.exe -- FFX2_LASTMISSION``.
-- Debugging can be performed from Visual Studio. Attach to either ``fhstage0.exe`` or ``FFX.exe``,
+- Debugging can be performed from Visual Studio. Pass ``--extdbg`` and optionally ``--wait`` to Stage 0, e.g. ``.\fhstage0.exe {PATH_TO_GAME}\FFX.exe --extdbg --wait``.
+Without ``--extdbg``, Stage 0 is itself the game's debugger, and Windows allows only one. Then attach to ``FFX.exe`` (or ``fhstage0.exe`` to debug the loader itself),
 and make sure to enable [mixed-mode debugging](https://learn.microsoft.com/en-us/visualstudio/debugger/how-to-debug-managed-and-native-code?view=vs-2022).

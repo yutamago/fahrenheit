@@ -101,7 +101,7 @@ public static class FhVdf {
                 while (pos < text.Length && text[pos] != '\n') pos++;
             }
             else if (c == '[') {
-                // Conditionals such as [$WIN32]. They are not used in the files we read; ignore them.
+                // Conditionals such as [$WIN32]. They are not used in the files we read, so they are skipped.
                 while (pos < text.Length && text[pos] != ']') pos++;
                 pos++;
             }
