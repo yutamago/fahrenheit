@@ -43,10 +43,12 @@ For a Debug build, change the `Configuration` parameter to `Debug`.
 ## Deploying/installing and debugging a local build
 
 To install/test your development build:
-- Create a subfolder in your game directory (where ``FFX.exe`` is) named ``fahrenheit``.
+- Create a new folder for the installation, outside the game directory.
 - In the directory in which you cloned Fahrenheit, navigate to ``artifacts\deploy``, then ``dbg`` or ``rel`` depending on build type (Debug or Release).
-- Copy its contents (the folders ``bin``, ``mods``, etc.) to the ``fahrenheit`` subfolder in the game directory.
-- Create an empty, extensionless file called `loadorder` in the `mods` directory. Add the mod IDs of mods you wish to load, each on their own line.
-- Open a terminal in ``fahrenheit/bin``, then issue ``.\fhstage0.exe ..\..\FFX.exe``.
+- Copy its contents (the folders ``bin``, ``mods``, etc.) to the installation folder.
+- Run ``bin\fhsetup.exe`` once. It checks the prerequisites, creates the `mods/loadorder` file and creates shortcuts that start the game.
+- Add the mod IDs of mods you wish to load to `mods/loadorder`, each on their own line.
+- Start the game with a shortcut, or open a terminal in ``bin`` and issue ``.\fhstage0.exe {PATH_TO_GAME}\FFX.exe``.
+  For Last Mission, issue ``.\fhstage0.exe {PATH_TO_GAME}\FFX-2.exe -- FFX2_LASTMISSION``.
 - Debugging can be performed from Visual Studio. Attach to either ``fhstage0.exe`` or ``FFX.exe``,
 and make sure to enable [mixed-mode debugging](https://learn.microsoft.com/en-us/visualstudio/debugger/how-to-debug-managed-and-native-code?view=vs-2022).
