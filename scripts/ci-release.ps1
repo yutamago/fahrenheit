@@ -86,7 +86,8 @@ try {
     $DirLog          = Join-Path -Path $DirArtifacts -ChildPath "log"
     $DirPkg          = Join-Path -Path $DirArtifacts -ChildPath "pkg" $DirArtifactFlavor
     $DirDeploy       = Join-Path -Path $DirArtifacts -ChildPath "deploy" $DirArtifactFlavor
-    $DirArtifactsBin = Join-Path -Path $DirDeploy    -ChildPath "bin"
+    $DirArtifactsBin   = Join-Path -Path $DirDeploy -ChildPath "bin"
+    $DirArtifactsSetup = Join-Path -Path $DirDeploy -ChildPath "setup"
     
     # Actual artifact and package locations
     $Artifacts    = Join-Path -Path $DirDeploy -ChildPath "**"
@@ -106,20 +107,45 @@ try {
         The NuGet packages are generated implicitly on successful build.
     #>
     
-    # Sign all Fahrenheit artifacts.
-    $ArtifactsToSign = Get-ChildItem -Path $DirArtifactsBin -Recurse -Include "fh*.dll", "fh*.exe"
+    # Sign all Fahrenheit artifacts, including the setup tool in `setup`.
+    $ArtifactsToSign = Get-ChildItem -Path $DirArtifactsBin, $DirArtifactsSetup -Recurse -Include "fh*.dll", "fh*.exe"
     signtool sign /sha1 $certFingerprint /tr http://time.certum.pl /fd sha1 /td sha256 /v $ArtifactsToSign
     
+    <#
+        The Linux setup tool must be built with NativeAOT on Linux, which CI does (see msbuild.yml).
+        Fetch it from the CI run of the commit being released. Linux binaries are not Authenticode-signed.
+    #>
+    $Commit = git rev-parse HEAD
+    $RunId  = gh run list --workflow msbuild.yml --commit $Commit --status success --limit 1 --json databaseId --jq ".[0].databaseId"
+
+    if (-not $RunId) {
+        throw "No successful CI run found for commit $Commit. Push it and wait for CI to finish before releasing."
+    }
+
+    gh run download $RunId --name fhsetup-linux-x64 --dir $DirArtifactsSetup
+    if ($LASTEXITCODE -ne 0) {
+        throw "Could not download the Linux setup tool from CI run $RunId."
+    }
+
     # ZIP up the signed release artifacts.
     7z a -tzip "fahrenheit_$($configuration)_$($tag).zip" $Artifacts
+
+    <#
+        Players download the setup tool on its own, from the links in README.md.
+        Asset names come from file names, so the Linux tool is copied to its published name.
+    #>
+    $DirStandalone = Join-Path -Path $DirArtifacts -ChildPath "standalone"
+    Create-Directory -Path $DirStandalone
+    Copy-Item -Path (Join-Path $DirArtifactsSetup "fhsetup.exe") -Destination (Join-Path $DirStandalone "fhsetup.exe")   -Force
+    Copy-Item -Path (Join-Path $DirArtifactsSetup "fhsetup")     -Destination (Join-Path $DirStandalone "fhsetup-linux") -Force
     
     if ($dryRun) {
         Write-Host "Dry run complete. Exiting."
         exit 0
     }
     
-    # Attach the generated release ZIP to the appropriate GH tag.
-    gh release upload $tag "fahrenheit_$($configuration)_$($tag).zip"
+    # Attach the generated release ZIP and the standalone setup tools to the appropriate GH tag.
+    gh release upload $tag "fahrenheit_$($configuration)_$($tag).zip" (Join-Path $DirStandalone "fhsetup.exe") (Join-Path $DirStandalone "fhsetup-linux")
     
     # Push the NuGet packages.
     # They are currently not signed pending a support thread with Certum wrt. inability to sign SHA-256.

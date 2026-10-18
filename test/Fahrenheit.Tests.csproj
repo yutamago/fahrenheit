@@ -35,6 +35,11 @@
         <ProjectReference Include="..\src\core\Fahrenheit.csproj" />
     </ItemGroup>
 
+    <!-- SETUP TOOL SOURCES -->
+    <ItemGroup>
+        <Compile Include="..\src\setup\core\*.cs" LinkBase="setup\core" />
+    </ItemGroup>
+
     <!-- EXTERNAL PROJECT REFS -->
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="10.0.1">
