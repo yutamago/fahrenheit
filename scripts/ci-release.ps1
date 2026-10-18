@@ -86,7 +86,8 @@ try {
     $DirLog          = Join-Path -Path $DirArtifacts -ChildPath "log"
     $DirPkg          = Join-Path -Path $DirArtifacts -ChildPath "pkg" $DirArtifactFlavor
     $DirDeploy       = Join-Path -Path $DirArtifacts -ChildPath "deploy" $DirArtifactFlavor
-    $DirArtifactsBin = Join-Path -Path $DirDeploy    -ChildPath "bin"
+    $DirArtifactsBin   = Join-Path -Path $DirDeploy -ChildPath "bin"
+    $DirArtifactsSetup = Join-Path -Path $DirDeploy -ChildPath "setup"
     
     # Actual artifact and package locations
     $Artifacts    = Join-Path -Path $DirDeploy -ChildPath "**"
@@ -106,8 +107,8 @@ try {
         The NuGet packages are generated implicitly on successful build.
     #>
     
-    # Sign all Fahrenheit artifacts.
-    $ArtifactsToSign = Get-ChildItem -Path $DirArtifactsBin -Recurse -Include "fh*.dll", "fh*.exe"
+    # Sign all Fahrenheit artifacts, including the setup tool in `setup`.
+    $ArtifactsToSign = Get-ChildItem -Path $DirArtifactsBin, $DirArtifactsSetup -Recurse -Include "fh*.dll", "fh*.exe"
     signtool sign /sha1 $certFingerprint /tr http://time.certum.pl /fd sha1 /td sha256 /v $ArtifactsToSign
     
     <#
@@ -121,7 +122,7 @@ try {
         throw "No successful CI run found for commit $Commit. Push it and wait for CI to finish before releasing."
     }
 
-    gh run download $RunId --name fhsetup-linux-x64 --dir $DirArtifactsBin
+    gh run download $RunId --name fhsetup-linux-x64 --dir $DirArtifactsSetup
     if ($LASTEXITCODE -ne 0) {
         throw "Could not download the Linux setup tool from CI run $RunId."
     }

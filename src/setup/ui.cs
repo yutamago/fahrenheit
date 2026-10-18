@@ -75,7 +75,7 @@ internal sealed unsafe class FhSetupUi : IDisposable {
         ImGui.TextColored(_color_muted, $"Prepares Fahrenheit to run on {_setup.platform.name}. Installed in: {_setup.install_dir}");
 
         if (!_setup.is_in_install_dir) {
-            _status_line(FhStatusIcon.WARNING, $"{FhLaunch.STAGE0_EXE_NAME} was not found next to this tool. Run it from the 'bin' folder of a Fahrenheit release.");
+            _status_line(FhStatusIcon.WARNING, $"{FhLaunch.STAGE0_EXE_NAME} was not found in the 'bin' folder. Run it from the 'setup' folder of a Fahrenheit release.");
         }
 
         ImGui.Spacing();

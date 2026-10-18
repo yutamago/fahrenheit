@@ -46,7 +46,7 @@ To install/test your development build:
 - Create a new folder for the installation, outside the game directory.
 - In the directory in which you cloned Fahrenheit, navigate to ``artifacts\deploy``, then ``dbg`` or ``rel`` depending on build type (Debug or Release).
 - Copy its contents (the folders ``bin``, ``mods``, etc.) to the installation folder.
-- Run ``bin\fhsetup.exe`` once. It checks the prerequisites, creates the `mods/loadorder` file and creates shortcuts that start the game.
+- Run ``setup\fhsetup.exe`` once. It checks the prerequisites, creates the `mods/loadorder` file and creates shortcuts that start the game.
 - Add the mod IDs of mods you wish to load to `mods/loadorder`, each on their own line.
 - Start the game with a shortcut, or open a terminal in ``bin`` and issue ``.\fhstage0.exe {PATH_TO_GAME}\FFX.exe``.
   For Last Mission, issue ``.\fhstage0.exe {PATH_TO_GAME}\FFX-2.exe -- FFX2_LASTMISSION``.

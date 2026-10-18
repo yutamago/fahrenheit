@@ -29,7 +29,7 @@ internal sealed class FhSetup {
     public readonly IFhSetupPlatform platform;
 
     /// <summary>
-    ///     The Fahrenheit installation directory: the parent of <c>bin</c>, which this tool runs from.
+    ///     The Fahrenheit installation directory: the parent of the <c>setup</c> folder this tool runs from.
     /// </summary>
     public readonly string install_dir;
     public readonly string bin_dir;
@@ -54,10 +54,10 @@ internal sealed class FhSetup {
     private volatile string _busy_status = "";
     private          float  _busy_progress = -1f;
 
-    public FhSetup(IFhSetupPlatform platform, string bin_dir) {
+    public FhSetup(IFhSetupPlatform platform, string setup_dir) {
         this.platform    = platform;
-        this.bin_dir     = Path.TrimEndingDirectorySeparator(Path.GetFullPath(bin_dir));
-        this.install_dir = Directory.GetParent(this.bin_dir)!.FullName;
+        this.install_dir = Directory.GetParent(Path.TrimEndingDirectorySeparator(Path.GetFullPath(setup_dir)))!.FullName;
+        this.bin_dir     = Path.Join(install_dir, "bin");
 
         shortcut_locations = platform.get_shortcut_locations(install_dir);
         location_enabled   = shortcut_locations.Select(location => location.enabled_by_default).ToArray();
@@ -65,7 +65,7 @@ internal sealed class FhSetup {
     }
 
     /// <summary>
-    ///     Whether this tool runs from a Fahrenheit installation's <c>bin</c> folder.
+    ///     Whether this tool runs from a Fahrenheit installation, i.e. next to its <c>bin</c> folder.
     /// </summary>
     public bool is_in_install_dir {
         get { return File.Exists(Path.Join(bin_dir, FhLaunch.STAGE0_EXE_NAME)); }

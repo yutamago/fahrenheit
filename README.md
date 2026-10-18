@@ -13,10 +13,10 @@ This know-how is free for you to use, learn from, analyze, and improve.
 ## Here just to play?
 1. Download the latest release from the [releases page](https://github.com/fahrenheit-crew/fahrenheit/releases)
    and extract it into a new folder, **outside** the game folder.
-2. Run `bin/fhsetup.exe`. It finds the game in your Steam library, installs anything missing
+2. Run `setup/fhsetup.exe`. It finds the game in your Steam library, installs anything missing
    (.NET, Visual C++ Redistributable) and creates shortcuts that start the game with Fahrenheit.
-   - On Linux and Steam Deck, run `bin/fhsetup` instead. ZIP files do not keep the executable flag, so allow it
-     to run first (right-click > *Properties* > *Permissions* > *Is executable*, or `chmod +x bin/fhsetup`).
+   - On Linux and Steam Deck, run `setup/fhsetup` instead. ZIP files do not keep the executable flag, so allow it
+     to run first (right-click > *Properties* > *Permissions* > *Is executable*, or `chmod +x setup/fhsetup`).
      It also needs [Protontricks](https://github.com/Matoking/protontricks), which Steam Deck users can get from the Discover store.
 3. Start the game with one of those shortcuts.
 

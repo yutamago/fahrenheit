@@ -91,7 +91,7 @@ internal static class FhSetupCli {
 
     private static void print_status(FhSetup setup) {
         Console.WriteLine($"Platform:      {setup.platform.name}");
-        Console.WriteLine($"Fahrenheit:    {setup.install_dir}{(setup.is_in_install_dir ? "" : " (fhstage0.exe not found in bin!)")}");
+        Console.WriteLine($"Fahrenheit:    {setup.install_dir}{(setup.is_in_install_dir ? "" : " (bin\\fhstage0.exe not found!)")}");
         Console.WriteLine($"Game folder:   {(setup.game_dir.Length == 0 ? "(not found)" : setup.game_dir)} [{setup.game_dir_source}, {(setup.game_info.is_valid ? "valid" : "invalid")}]");
 
         foreach (FhPrereqStatus status in setup.prereqs) {

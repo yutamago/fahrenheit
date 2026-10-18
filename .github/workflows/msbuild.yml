@@ -58,12 +58,15 @@ jobs:
       run: msbuild /m /p:ContinuousIntegrationBuild=true /p:Configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.SOLUTION_FILE_PATH }}
 
       # fhsetup must be a NativeAOT executable, as it installs the .NET runtime other tools depend on.
-    - name: Check that fhsetup was built with NativeAOT
+      # Its 64-bit native libraries must stay out of `bin`, where the game would try to load them.
+    - name: Check the fhsetup build
       shell: pwsh
       run: |
-        $bin = "artifacts\deploy\${{ env.BUILD_CONFIGURATION == 'release' && 'rel' || 'dbg' }}\bin"
-        if (-not (Test-Path "$bin\fhsetup.exe")) { throw "fhsetup.exe is missing." }
-        if (Test-Path "$bin\fhsetup.dll")        { throw "fhsetup was built framework-dependent, not with NativeAOT." }
+        $deploy = "artifacts\deploy\${{ env.BUILD_CONFIGURATION == 'release' && 'rel' || 'dbg' }}"
+        if (-not (Test-Path "$deploy\setup\fhsetup.exe")) { throw "setup\fhsetup.exe is missing." }
+        if (Test-Path "$deploy\setup\fhsetup.dll")        { throw "fhsetup was built framework-dependent, not with NativeAOT." }
+        $stray = Get-ChildItem "$deploy\bin\*" -File -Include cimgui.dll, SDL3.dll, ImGuiImpl.dll, ImGuiImplSDL3.dll, fhsetup*
+        if ($stray) { throw "Native libraries in bin would be loaded into the game instead of the x86 ones: $($stray.Name -join ', ')" }
 
       # Unsigned build output, for testing pull requests without building them locally.
     - name: Upload build output

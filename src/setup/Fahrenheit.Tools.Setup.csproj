@@ -40,6 +40,15 @@
         <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     </PropertyGroup>
 
+    <!--
+    The tool is published into its own `setup` folder, not `bin`. Its native libraries (SDL3, cimgui, ...)
+    are 64-bit and share names with the 32-bit ones Fahrenheit loads into the game; the in-game loader
+    probes `bin` first, so copies there break Fahrenheit (it fails to load cimgui and the game exits).
+    -->
+    <PropertyGroup>
+        <PublishDir>$([MSBuild]::NormalizeDirectory('$(_FhOutDir)', 'setup'))</PublishDir>
+    </PropertyGroup>
+
     <!-- APPLICATION ASSETS -->
     <PropertyGroup>
         <ApplicationIcon>..\..\assets\fh_base_256.ico</ApplicationIcon>
