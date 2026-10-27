@@ -2704,8 +2704,11 @@ public static partial class FhCall {
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_000_RetI => new( new FhCallLocation("FFX.exe", 0x51C530) );
 
+    // Summaries from here to 806Bh: native names from ffx-rust, arguments in push order (the last one is on top of the stack).
+    /// <summary>RenderSetFlag10</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_001_RetI => new( new FhCallLocation("FFX.exe", 0x51C5B0) );
 
+    /// <summary>FpRun(fp id, restart)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_002_RetI => new( new FhCallLocation("FFX.exe", 0x51C670) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_003_RetI => new( new FhCallLocation("FFX.exe", 0x51C7A0) );
@@ -2713,10 +2716,14 @@ public static partial class FhCall {
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Init> AtelFn_Map_004_Init => new( new FhCallLocation("FFX.exe", 0x51AF60) );
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Exec> AtelFn_Map_004_Exec => new( new FhCallLocation("FFX.exe", 0x51AFA0) );
 
+    /// <summary>MapSpriteWaitEnd</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Init> AtelFn_Map_005_Init => new( new FhCallLocation("FFX.exe", 0x51C7E0) );
+    /// <summary>MapSpriteWaitEnd</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Exec> AtelFn_Map_005_Exec => new( new FhCallLocation("FFX.exe", 0x51C860) );
 
+    /// <summary>MapJumpToEntrance</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Init> AtelFn_Map_006_Init => new( new FhCallLocation("FFX.exe", 0x51AFF0) );
+    /// <summary>MapJumpToEntrance</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Exec> AtelFn_Map_006_Exec => new( new FhCallLocation("FFX.exe", 0x51B040) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_007_RetI => new( new FhCallLocation("FFX.exe", 0x51B050) );
@@ -2725,70 +2732,102 @@ public static partial class FhCall {
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_009_RetI => new( new FhCallLocation("FFX.exe", 0x51B070) );
 
+    /// <summary>FpBindPos(fp id, x, y, z)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_00A_RetI => new( new FhCallLocation("FFX.exe", 0x51B0A0) );
 
+    /// <summary>FpUnbind(fp id; &lt;= 0 = all)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_00B_RetI => new( new FhCallLocation("FFX.exe", 0x51B130) );
 
+    /// <summary>FpSetDisp</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_00C_RetI => new( new FhCallLocation("FFX.exe", 0x51B160) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_00D_RetI => new( new FhCallLocation("FFX.exe", 0x51C740) );
 
+    /// <summary>MapPartGetCount</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_00E_RetI => new( new FhCallLocation("FFX.exe", 0x51B190) );
 
+    /// <summary>MapPartShow(part index)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_00F_RetI => new( new FhCallLocation("FFX.exe", 0x51B1A0) );
 
+    /// <summary>MapPartHide(part index)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_010_RetI => new( new FhCallLocation("FFX.exe", 0x51B1E0) );
 
+    /// <summary>MapPartSetOffset</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_011_RetI => new( new FhCallLocation("FFX.exe", 0x51B200) );
 
+    /// <summary>MapPartGet0C(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_012_RetI => new( new FhCallLocation("FFX.exe", 0x51B240) );
 
+    /// <summary>MapPartGet10(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_013_RetI => new( new FhCallLocation("FFX.exe", 0x51B260) );
 
+    /// <summary>MapPartSet14</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_014_RetI => new( new FhCallLocation("FFX.exe", 0x51B280) );
 
+    /// <summary>MapPartGet14(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetF> AtelFn_Map_015_RetF => new( new FhCallLocation("FFX.exe", 0x51B2C0) );
 
+    /// <summary>MapPartSet24(a, b, c)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_016_RetI => new( new FhCallLocation("FFX.exe", 0x51B2E0) );
 
+    /// <summary>MapPartGet24(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_017_RetI => new( new FhCallLocation("FFX.exe", 0x51B320) );
 
+    /// <summary>MapPartGet28(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_018_RetI => new( new FhCallLocation("FFX.exe", 0x51B340) );
 
+    /// <summary>MapPartSetSize(a, b, c)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_019_RetI => new( new FhCallLocation("FFX.exe", 0x51B360) );
 
+    /// <summary>MapPartGetWidth(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_01A_RetI => new( new FhCallLocation("FFX.exe", 0x51B3A0) );
 
+    /// <summary>MapPartGetHeight(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_01B_RetI => new( new FhCallLocation("FFX.exe", 0x51B3C0) );
 
+    /// <summary>MapPartAnimCount(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_01C_RetI => new( new FhCallLocation("FFX.exe", 0x51B3E0) );
 
+    /// <summary>MapPartSetFrame</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_01D_RetI => new( new FhCallLocation("FFX.exe", 0x51B400) );
 
+    /// <summary>MapPartAnimeFlag0On</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_01E_RetI => new( new FhCallLocation("FFX.exe", 0x51B430) );
 
+    /// <summary>MapPartAnimeFlag0Off</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_01F_RetI => new( new FhCallLocation("FFX.exe", 0x51B450) );
 
+    /// <summary>MapPartAnimOn</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_020_RetI => new( new FhCallLocation("FFX.exe", 0x51B470) );
 
+    /// <summary>MapPartAnimOff</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_021_RetI => new( new FhCallLocation("FFX.exe", 0x51B490) );
 
+    /// <summary>MapPartAnimMode</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_022_RetI => new( new FhCallLocation("FFX.exe", 0x51B4B0) );
 
+    /// <summary>BgSetScrOffset(a f, b f)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_023_RetI => new( new FhCallLocation("FFX.exe", 0x51B4E0) );
 
+    /// <summary>SceneGetB8</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetF> AtelFn_Map_024_RetF => new( new FhCallLocation("FFX.exe", 0x51B530) );
 
+    /// <summary>SceneGetBC</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetF> AtelFn_Map_025_RetF => new( new FhCallLocation("FFX.exe", 0x51B540) );
 
+    /// <summary>SceneSetC0</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_026_RetI => new( new FhCallLocation("FFX.exe", 0x51B550) );
 
+    /// <summary>SceneWaveC0Stop</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_027_RetI => new( new FhCallLocation("FFX.exe", 0x51B5C0) );
 
+    /// <summary>BgSetScrBank(v f)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_028_RetI => new( new FhCallLocation("FFX.exe", 0x51B5D0) );
 
+    /// <summary>SceneGetAC</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetF> AtelFn_Map_029_RetF => new( new FhCallLocation("FFX.exe", 0x51B600) );
 
+    /// <summary>SceneSetDC(a, b f, c, d f)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_02A_RetI => new( new FhCallLocation("FFX.exe", 0x51B610) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_02B_RetI => new( new FhCallLocation("FFX.exe", 0x51B670) );
@@ -2797,34 +2836,47 @@ public static partial class FhCall {
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_02D_RetI => new( new FhCallLocation("FFX.exe", 0x51B690) );
 
+    /// <summary>MapPartAnimRate</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_02E_RetI => new( new FhCallLocation("FFX.exe", 0x51B6A0) );
 
+    /// <summary>MapPartLastFrame</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_02F_RetI => new( new FhCallLocation("FFX.exe", 0x51B6D0) );
 
+    /// <summary>MapPartSetAlpha</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_030_RetI => new( new FhCallLocation("FFX.exe", 0x51B6F0) );
 
+    /// <summary>MapPartGetAlpha(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_031_RetI => new( new FhCallLocation("FFX.exe", 0x51B720) );
 
+    /// <summary>GuideMapSetLimit</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_032_RetI => new( new FhCallLocation("FFX.exe", 0x51B740) );
 
+    /// <summary>GuideMapGetLimit</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetF> AtelFn_Map_033_RetF => new( new FhCallLocation("FFX.exe", 0x51B770) );
 
+    /// <summary>FpDispDebug</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_034_RetI => new( new FhCallLocation("FFX.exe", 0x51B780) );
 
+    /// <summary>FpRunGroup</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_035_RetI => new( new FhCallLocation("FFX.exe", 0x51B790) );
 
+    /// <summary>FpShowGroup</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_036_RetI => new( new FhCallLocation("FFX.exe", 0x51B7D0) );
 
+    /// <summary>FogSetParams</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_037_RetI => new( new FhCallLocation("FFX.exe", 0x51B810) );
 
+    /// <summary>FogSetParam0</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_038_RetI => new( new FhCallLocation("FFX.exe", 0x51B8B0) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetF> AtelFn_Map_039_RetF => new( new FhCallLocation("FFX.exe", 0x51B930) );
 
+    /// <summary>FogSetParam1</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_03A_RetI => new( new FhCallLocation("FFX.exe", 0x51B960) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetF> AtelFn_Map_03B_RetF => new( new FhCallLocation("FFX.exe", 0x51B9E0) );
 
+    /// <summary>FogSetParam2</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_03C_RetI => new( new FhCallLocation("FFX.exe", 0x51BA10) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetF> AtelFn_Map_03D_RetF => new( new FhCallLocation("FFX.exe", 0x51BAA0) );
@@ -2845,10 +2897,13 @@ public static partial class FhCall {
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_045_RetI => new( new FhCallLocation("FFX.exe", 0x51BEB0) );
 
+    /// <summary>BackSetRed(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_046_RetI => new( new FhCallLocation("FFX.exe", 0x51BF10) );
 
+    /// <summary>BackSetGreen(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_047_RetI => new( new FhCallLocation("FFX.exe", 0x51BF60) );
 
+    /// <summary>BackSetBlue(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_048_RetI => new( new FhCallLocation("FFX.exe", 0x51BFB0) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_049_RetI => new( new FhCallLocation("FFX.exe", 0x51C000) );
@@ -2857,48 +2912,69 @@ public static partial class FhCall {
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_04B_RetI => new( new FhCallLocation("FFX.exe", 0x51C060) );
 
+    /// <summary>MapPartSet44Both(part, v f)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_04C_RetI => new( new FhCallLocation("FFX.exe", 0x51C090) );
 
+    /// <summary>MapPartSet44First(part, v f)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_04D_RetI => new( new FhCallLocation("FFX.exe", 0x51C0D0) );
 
+    /// <summary>MapPartSet44Second(part, v f)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_04E_RetI => new( new FhCallLocation("FFX.exe", 0x51C110) );
 
+    /// <summary>MapPartScaleTo</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_04F_RetI => new( new FhCallLocation("FFX.exe", 0x51C150) );
 
+    /// <summary>MapPartScaleX(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetF> AtelFn_Map_050_RetF => new( new FhCallLocation("FFX.exe", 0x51C1A0) );
 
+    /// <summary>MapPartScaleY(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetF> AtelFn_Map_051_RetF => new( new FhCallLocation("FFX.exe", 0x51C1C0) );
 
+    /// <summary>MapPartSetPos(a, b f, c f)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_052_RetI => new( new FhCallLocation("FFX.exe", 0x51C1E0) );
 
+    /// <summary>MapPartSetX(i, v f)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_053_RetI => new( new FhCallLocation("FFX.exe", 0x51C230) );
 
+    /// <summary>MapPartSetY(i, v f)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_054_RetI => new( new FhCallLocation("FFX.exe", 0x51C280) );
 
+    /// <summary>MapPartMoveTo(a, b f, c f, d)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_055_RetI => new( new FhCallLocation("FFX.exe", 0x51C2D0) );
 
+    /// <summary>MapPartPosX(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetF> AtelFn_Map_056_RetF => new( new FhCallLocation("FFX.exe", 0x51C330) );
 
+    /// <summary>MapPartPosY(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetF> AtelFn_Map_057_RetF => new( new FhCallLocation("FFX.exe", 0x51C350) );
 
+    /// <summary>FpSetStickChr(pc, b, a)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_058_RetI => new( new FhCallLocation("FFX.exe", 0x51C370) );
 
+    /// <summary>FpSetStickMap</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_059_RetI => new( new FhCallLocation("FFX.exe", 0x51C3C0) );
 
+    /// <summary>FpResetStick(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_05A_RetI => new( new FhCallLocation("FFX.exe", 0x51C3F0) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_05B_RetI => new( new FhCallLocation("FFX.exe", 0x51C410) );
 
+    /// <summary>VideoAtEndSet</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_05C_RetI => new( new FhCallLocation("FFX.exe", 0x51C470) );
 
+    /// <summary>MapPartAnimeResetAll</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_05D_RetI => new( new FhCallLocation("FFX.exe", 0x51C4A0) );
 
+    /// <summary>GuideSetMapNo</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_05E_RetI => new( new FhCallLocation("FFX.exe", 0x51C4D0) );
 
+    /// <summary>FpFree</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_05F_RetI => new( new FhCallLocation("FFX.exe", 0x51C4F0) );
 
+    /// <summary>FpGroupForceOff</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_060_RetI => new( new FhCallLocation("FFX.exe", 0x51C510) );
 
+    /// <summary>RenderSetParam(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_061_RetI => new( new FhCallLocation("FFX.exe", 0x51C580) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_062_RetI => new( new FhCallLocation("FFX.exe", 0x51C5A0) );
@@ -2907,18 +2983,24 @@ public static partial class FhCall {
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_064_RetI => new( new FhCallLocation("FFX.exe", 0x51C6B0) );
 
+    /// <summary>CheckDobj(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_065_RetI => new( new FhCallLocation("FFX.exe", 0x51C780) );
 
+    /// <summary>FpStopStatus</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_066_RetI => new( new FhCallLocation("FFX.exe", 0x51C7C0) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_067_RetI => new( new FhCallLocation("FFX.exe", 0x51C810) );
 
+    /// <summary>FpM173End</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_068_RetI => new( new FhCallLocation("FFX.exe", 0x51C890) );
 
+    /// <summary>FpSetStickDobj(b, a)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_069_RetI => new( new FhCallLocation("FFX.exe", 0x51AF30) );
 
+    /// <summary>SceneSet104</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_06A_RetI => new( new FhCallLocation("FFX.exe", 0x51AF80) );
 
+    /// <summary>VideoAtEndSetTwo</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Map_06B_RetI => new( new FhCallLocation("FFX.exe", 0x51AFC0) );
 
     // MnFunc (9000h)
@@ -2927,20 +3009,31 @@ public static partial class FhCall {
 
     // MovieFunc (B000h-B00Fh)
 
+    // Summaries from here to B00Fh: native names from ffx-rust, arguments in push order (the last one is on top of the stack).
+    /// <summary>MovieStart(movie int, flags int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Init> AtelFn_Fmv_000_Init => new( new FhCallLocation("FFX.exe", 0x36E910) );
+    /// <summary>MovieStart(movie int, flags int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Exec> AtelFn_Fmv_000_Exec => new( new FhCallLocation("FFX.exe", 0x36E980) );
+    /// <summary>MovieStart(movie int, flags int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Fmv_000_RetI => new( new FhCallLocation("FFX.exe", 0x36E990) );
 
+    /// <summary>MovieWait()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Init> AtelFn_Fmv_001_Init => new( new FhCallLocation("FFX.exe", 0x36E9B0) );
+    /// <summary>MovieWait()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Exec> AtelFn_Fmv_001_Exec => new( new FhCallLocation("FFX.exe", 0x36E9C0) );
+    /// <summary>MovieWait()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Fmv_001_RetI => new( new FhCallLocation("FFX.exe", 0x36E9F0) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Fmv_002_RetI => new( new FhCallLocation("FFX.exe", 0x36EA30) );
 
+    /// <summary>MovieGetFrame()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Fmv_003_RetI => new( new FhCallLocation("FFX.exe", 0x36EA40) );
 
+    /// <summary>MovieClose()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Init> AtelFn_Fmv_004_Init => new( new FhCallLocation("FFX.exe", 0x36EA50) );
+    /// <summary>MovieClose()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Exec> AtelFn_Fmv_004_Exec => new( new FhCallLocation("FFX.exe", 0x36EA60) );
+    /// <summary>MovieClose()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Fmv_004_RetI => new( new FhCallLocation("FFX.exe", 0x36EAC0) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Fmv_005_RetI => new( new FhCallLocation("FFX.exe", 0x36EAD0) );
@@ -2949,22 +3042,35 @@ public static partial class FhCall {
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Fmv_007_RetI => new( new FhCallLocation("FFX.exe", 0x36EAF0) );
 
+    /// <summary>DebugPrint</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Init> AtelFn_Fmv_008_Init => new( new FhCallLocation("FFX.exe", 0x36EB00) );
+    /// <summary>DebugPrint</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Exec> AtelFn_Fmv_008_Exec => new( new FhCallLocation("FFX.exe", 0x36EB10) );
+    /// <summary>DebugPrint</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Fmv_008_RetI => new( new FhCallLocation("FFX.exe", 0x36EB20) );
 
+    /// <summary>MovieCameraWait()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Init> AtelFn_Fmv_009_Init => new( new FhCallLocation("FFX.exe", 0x36EB30) );
+    /// <summary>MovieCameraWait()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Exec> AtelFn_Fmv_009_Exec => new( new FhCallLocation("FFX.exe", 0x36EB40) );
+    /// <summary>MovieCameraWait()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Fmv_009_RetI => new( new FhCallLocation("FFX.exe", 0x36EB60) );
 
+    /// <summary>MovieStartPicture(movie, flags)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Init> AtelFn_Fmv_00A_Init => new( new FhCallLocation("FFX.exe", 0x36EB80) );
+    /// <summary>MovieStartPicture(movie, flags)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Exec> AtelFn_Fmv_00A_Exec => new( new FhCallLocation("FFX.exe", 0x36EBE0) );
+    /// <summary>MovieStartPicture(movie, flags)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Fmv_00A_RetI => new( new FhCallLocation("FFX.exe", 0x36EC10) );
 
+    /// <summary>MovieDestroyWait()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Init> AtelFn_Fmv_00B_Init => new( new FhCallLocation("FFX.exe", 0x36EC20) );
+    /// <summary>MovieDestroyWait()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Exec> AtelFn_Fmv_00B_Exec => new( new FhCallLocation("FFX.exe", 0x36EC30) );
+    /// <summary>MovieDestroyWait()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Fmv_00B_RetI => new( new FhCallLocation("FFX.exe", 0x36EC40) );
 
+    /// <summary>MovieGetManager()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Fmv_00C_RetI => new( new FhCallLocation("FFX.exe", 0x36EC90) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Fmv_00D_RetI => new( new FhCallLocation("FFX.exe", 0x36ECB0) );
@@ -2975,191 +3081,276 @@ public static partial class FhCall {
 
     // Debug (C000h-C05Dh)
 
+    // Summaries from here to C05Dh: native names from ffx-rust, arguments in push order (the last one is on top of the stack).
+    /// <summary>SaveEventToHost</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_000_RetI => new( new FhCallLocation("FFX.exe", 0x478420) );
 
+    /// <summary>SaveEventFromHost</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_001_RetI => new( new FhCallLocation("FFX.exe", 0x478490) );
 
+    /// <summary>SetConfigHiragana(on)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_002_RetI => new( new FhCallLocation("FFX.exe", 0x4784E0) );
 
+    /// <summary>MapLoad(map)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_003_RetI => new( new FhCallLocation("FFX.exe", 0x478510) );
 
+    /// <summary>CaptureEnableKari</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_004_RetI => new( new FhCallLocation("FFX.exe", 0x478570) );
 
+    /// <summary>CaptureEnableKariOn</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_005_RetI => new( new FhCallLocation("FFX.exe", 0x4785B0) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_006_RetI => new( new FhCallLocation("FFX.exe", 0x4785E0) );
 
+    /// <summary>SetStartMapIndex(map, index)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_007_RetI => new( new FhCallLocation("FFX.exe", 0x478600) );
 
+    /// <summary>VarAddressDropOne(var int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_008_RetI => new( new FhCallLocation("FFX.exe", 0x478390) );
 
+    /// <summary>SetEventMode(mode)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_009_RetI => new( new FhCallLocation("FFX.exe", 0x478630) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_00B_RetI => new( new FhCallLocation("FFX.exe", 0x478690) );
 
+    /// <summary>LoadFieldParticle()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_00C_RetI => new( new FhCallLocation("FFX.exe", 0x478650) );
 
+    /// <summary>SetConfigCreditName(on)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_00D_RetI => new( new FhCallLocation("FFX.exe", 0x4786D0) );
 
+    /// <summary>SqsSePlay(id, b, c, d)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_00E_RetI => new( new FhCallLocation("FFX.exe", 0x478700) );
 
+    /// <summary>VarAddressDropZero(var int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_00F_RetI => new( new FhCallLocation("FFX.exe", 0x478750) );
 
+    /// <summary>StreamStandby(voice int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_010_RetI => new( new FhCallLocation("FFX.exe", 0x478770) );
 
+    /// <summary>StreamStart</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_011_RetI => new( new FhCallLocation("FFX.exe", 0x478790) );
 
+    /// <summary>StreamGetState</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_012_RetI => new( new FhCallLocation("FFX.exe", 0x4787A0) );
 
+    /// <summary>SaveConfigHiragana()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_013_RetI => new( new FhCallLocation("FFX.exe", 0x4787B0) );
 
+    /// <summary>GlobalBitTest()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_014_RetI => new( new FhCallLocation("FFX.exe", 0x4787C0) );
 
+    /// <summary>SepTransFromHost</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_015_RetI => new( new FhCallLocation("FFX.exe", 0x4787D0) );
 
+    /// <summary>SepPlaySimple(v int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_016_RetI => new( new FhCallLocation("FFX.exe", 0x478860) );
 
+    /// <summary>SepStop(v int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_017_RetI => new( new FhCallLocation("FFX.exe", 0x478880) );
 
+    /// <summary>SqsSetProjectBase()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_018_RetI => new( new FhCallLocation("FFX.exe", 0x4788A0) );
 
+    /// <summary>MapLoadNoCache(map)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_019_RetI => new( new FhCallLocation("FFX.exe", 0x478550) );
 
+    /// <summary>SndKickFoot(party, kick, variation)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_01A_RetI => new( new FhCallLocation("FFX.exe", 0x4788E0) );
 
+    /// <summary>SndKickFoot(party, kick, variation)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_01B_RetI => new( new FhCallLocation("FFX.exe", 0x478920) );
 
+    /// <summary>SndKickFoot(party, kick)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_01C_RetI => new( new FhCallLocation("FFX.exe", 0x478960) );
 
+    /// <summary>SndKickFoot(party, kick, variation)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_01D_RetI => new( new FhCallLocation("FFX.exe", 0x4789A0) );
 
+    /// <summary>SndKickFoot(party, kick, variation)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_01E_RetI => new( new FhCallLocation("FFX.exe", 0x4789E0) );
 
+    /// <summary>SndKickFoot(party, kick, variation)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_01F_RetI => new( new FhCallLocation("FFX.exe", 0x478A20) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_020_RetI => new( new FhCallLocation("FFX.exe", 0x478AC0) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_021_RetI => new( new FhCallLocation("FFX.exe", 0x478AE0) );
 
+    /// <summary>EnableDrawGui()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_022_RetI => new( new FhCallLocation("FFX.exe", 0x478B00) );
 
+    /// <summary>ChrGetPos(worker, kind, x var, y var, z var)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_023_RetI => new( new FhCallLocation("FFX.exe", 0x478B40) );
 
+    /// <summary>BtlEnd(_, v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Init> AtelFn_Dbg_024_Init => new( new FhCallLocation("FFX.exe", 0x478C10) );
+    /// <summary>BtlEnd(_, v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_Exec> AtelFn_Dbg_024_Exec => new( new FhCallLocation("FFX.exe", 0x478C60) );
 
+    /// <summary>SetChrName</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_025_RetI => new( new FhCallLocation("FFX.exe", 0x478C70) );
 
+    /// <summary>MusicStandby(var int, v int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_026_RetI => new( new FhCallLocation("FFX.exe", 0x478CE0) );
 
+    /// <summary>DebugCollectBits</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_027_RetI => new( new FhCallLocation("FFX.exe", 0x478D20) );
 
+    /// <summary>ImportantSetAll()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_028_RetI => new( new FhCallLocation("FFX.exe", 0x478D60) );
 
+    /// <summary>TurnSelectAngle(flags, b, a)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_029_RetI => new( new FhCallLocation("FFX.exe", 0x478D90) );
 
+    /// <summary>OutputEncountStart()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_02A_RetI => new( new FhCallLocation("FFX.exe", 0x478E10) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_02B_RetI => new( new FhCallLocation("FFX.exe", 0x478E50) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_02C_RetI => new( new FhCallLocation("FFX.exe", 0x478E60) );
 
+    /// <summary>SndKickFoot(party int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_02D_RetI => new( new FhCallLocation("FFX.exe", 0x478A60) );
 
+    /// <summary>SndKickFoot(party int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_02E_RetI => new( new FhCallLocation("FFX.exe", 0x478A90) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_02F_RetI => new( new FhCallLocation("FFX.exe", 0x478E80) );
 
+    /// <summary>CtrlGetRemoveClearsDebug()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_030_RetI => new( new FhCallLocation("FFX.exe", 0x478ED0) );
 
+    /// <summary>MapLoadBtl(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_031_RetI => new( new FhCallLocation("FFX.exe", 0x478530) );
 
+    /// <summary>AlwaysTrue()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_032_RetI => new( new FhCallLocation("FFX.exe", 0x478EF0) );
 
+    /// <summary>EnableGetTexture</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_033_RetI => new( new FhCallLocation("FFX.exe", 0x478F10) );
 
+    /// <summary>EnableSetTexture</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_034_RetI => new( new FhCallLocation("FFX.exe", 0x478F20) );
 
+    /// <summary>GetBindPcChr(pc)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_035_RetI => new( new FhCallLocation("FFX.exe", 0x478F50) );
 
+    /// <summary>FpSetDisp(on)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_036_RetI => new( new FhCallLocation("FFX.exe", 0x478F70) );
 
+    /// <summary>TableGetU16(i int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_037_RetI => new( new FhCallLocation("FFX.exe", 0x478FA0) );
 
+    /// <summary>CdCallPair(c, b, var)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_038_RetI => new( new FhCallLocation("FFX.exe", 0x478FE0) );
 
+    /// <summary>CdCall8(v int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_039_RetI => new( new FhCallLocation("FFX.exe", 0x479040) );
 
+    /// <summary>ShoutStreamStart(a, b, volume)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_03A_RetI => new( new FhCallLocation("FFX.exe", 0x479070) );
 
+    /// <summary>FullItem()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_03B_RetI => new( new FhCallLocation("FFX.exe", 0x4790B0) );
 
+    /// <summary>FullCommand()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_03C_RetI => new( new FhCallLocation("FFX.exe", 0x4790C0) );
 
+    /// <summary>SetEffectFlag(bit int, on int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_03D_RetI => new( new FhCallLocation("FFX.exe", 0x4790D0) );
 
+    /// <summary>SepIsPlaying(v int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_03E_RetI => new( new FhCallLocation("FFX.exe", 0x479110) );
 
+    /// <summary>SetSoundMode(v int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_03F_RetI => new( new FhCallLocation("FFX.exe", 0x479130) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_040_RetI => new( new FhCallLocation("FFX.exe", 0x479150) );
 
+    /// <summary>SetSoundType(v int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_041_RetI => new( new FhCallLocation("FFX.exe", 0x479160) );
 
+    /// <summary>GetSoundType</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_042_RetI => new( new FhCallLocation("FFX.exe", 0x479180) );
 
+    /// <summary>SepClearAll</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_043_RetI => new( new FhCallLocation("FFX.exe", 0x479190) );
 
+    /// <summary>RestartSyncH(v int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_044_RetI => new( new FhCallLocation("FFX.exe", 0x4791A0) );
 
+    /// <summary>GetSyncH(v int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_045_RetI => new( new FhCallLocation("FFX.exe", 0x4791C0) );
 
+    /// <summary>DropArg(v int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_046_RetI => new( new FhCallLocation("FFX.exe", 0x4791E0) );
 
+    /// <summary>SaveEventGetFloat(offset int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetF> AtelFn_Dbg_047_RetF => new( new FhCallLocation("FFX.exe", 0x479200) );
 
+    /// <summary>SaveEventSetFloat(offset int, v f)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetF> AtelFn_Dbg_048_RetF => new( new FhCallLocation("FFX.exe", 0x479280) );
 
+    /// <summary>SaveEventGetU32(offset int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_049_RetI => new( new FhCallLocation("FFX.exe", 0x479220) );
 
+    /// <summary>SaveEventSetU32(offset int, v f)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_04A_RetI => new( new FhCallLocation("FFX.exe", 0x4792C0) );
 
+    /// <summary>SaveEventGetI16(offset int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_04B_RetI => new( new FhCallLocation("FFX.exe", 0x479240) );
 
+    /// <summary>SaveEventSetU16(offset int, v f)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_04C_RetI => new( new FhCallLocation("FFX.exe", 0x479300) );
 
+    /// <summary>SaveEventGetI8(offset int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_04D_RetI => new( new FhCallLocation("FFX.exe", 0x479260) );
 
+    /// <summary>SaveEventSetU8(offset int, v f)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_04E_RetI => new( new FhCallLocation("FFX.exe", 0x479340) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_04F_RetI => new( new FhCallLocation("FFX.exe", 0x479380) );
 
+    /// <summary>MovieStop</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_050_RetI => new( new FhCallLocation("FFX.exe", 0x479390) );
 
+    /// <summary>SetTgs(on)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_051_RetI => new( new FhCallLocation("FFX.exe", 0x4793B0) );
 
+    /// <summary>GetTGS()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_052_RetI => new( new FhCallLocation("FFX.exe", 0x4793E0) );
 
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_053_RetI => new( new FhCallLocation("FFX.exe", 0x4793F0) );
 
+    /// <summary>MemAlloc(n)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_054_RetI => new( new FhCallLocation("FFX.exe", 0x4781B0) );
 
+    /// <summary>MemFree(p)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_055_RetI => new( new FhCallLocation("FFX.exe", 0x4781D0) );
 
+    /// <summary>CdRead()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_056_RetI => new( new FhCallLocation("FFX.exe", 0x478230) );
 
+    /// <summary>CopyToSaveRam()</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_057_RetI => new( new FhCallLocation("FFX.exe", 0x4781F0) );
 
+    /// <summary>GetVarAddress(v)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_058_RetI => new( new FhCallLocation("FFX.exe", 0x478280) );
 
+    /// <summary>SetCmdMenuPanel(i, on)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_059_RetI => new( new FhCallLocation("FFX.exe", 0x4782A0) );
 
+    /// <summary>SndKickEvent(event int, variation int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_05A_RetI => new( new FhCallLocation("FFX.exe", 0x4782F0) );
 
+    /// <summary>DebugPs2String(v int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_05B_RetI => new( new FhCallLocation("FFX.exe", 0x478330) );
 
+    /// <summary>DebugPs2String</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_05C_RetI => new( new FhCallLocation("FFX.exe", 0x4783C0) );
 
+    /// <summary>SetLang(v int)</summary>
     public static FhCallHandle<Fahrenheit.FhCall.d_CT_RetI> AtelFn_Dbg_05D_RetI => new( new FhCallLocation("FFX.exe", 0x478470) );
 
     // AbilityMap (D000h)
