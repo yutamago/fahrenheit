@@ -36,8 +36,15 @@ public unsafe struct AtelStackVar {
     [FieldOffset(0x0)] public float as_float;
 }
 
+/* The game's stack functions (AtelPushStackInteger, AtelPushStackFloat, AtelPopStackInteger, AtelPopStackFloat):
+ * - a push onto a stack holding 19 values is dropped, although there is room for 20;
+ * - a pop converts by the slot's type: pop_int truncates anything not tagged I32 as a float,
+ *   pop_float converts anything not tagged F32 from an int;
+ * - an empty pop returns 0 and a full push is dropped; both clear the game's error flag at 0xF270D8.
+ *   The managed helpers below throw instead.
+ */
 public struct AtelStack {
-    public const int MAX_SIZE = 20;
+    public const int MAX_SIZE = 19;
 
     public int                 size;
     public AtelStackValueArray values;
@@ -47,13 +54,9 @@ public struct AtelStack {
         if (size <= 0) throw new AtelStackOverflowException("Attempted to pop from an empty stack");
         int i = size - 1;
 
-        AtelStackVar value = this[i].var;
-
-        int x = types[i] switch {
-            AtelStackType.F32 => (int)value.as_float,
-            AtelStackType.I32 => value.as_int,
-            _                 => 0
-        };
+        int x = types[i] == AtelStackType.I32
+            ? values.as_int()[i]
+            : truncate(values.as_float()[i]);
 
         types[i] = AtelStackType.None;
         size -= 1;
@@ -64,17 +67,18 @@ public struct AtelStack {
         if (size <= 0) throw new AtelStackOverflowException("Attempted to pop from an empty stack");
         int i = size - 1;
 
-        AtelStackVar value = this[i].var;
-
-        float x = types[i] switch {
-            AtelStackType.F32 => (int)value.as_float,
-            AtelStackType.I32 => value.as_int,
-            _                 => 0
-        };
+        float x = types[i] == AtelStackType.F32
+            ? values.as_float()[i]
+            : values.as_int()[i];
 
         types[i] = AtelStackType.None;
         size -= 1;
         return x;
+    }
+
+    // _ftol2_sse: truncation toward zero, 0x80000000 for NaN and values out of range.
+    private static int truncate(float f) {
+        return f is >= -2147483648f and < 2147483648f ? (int)f : int.MinValue;
     }
 
     public void push_int(int value) {
