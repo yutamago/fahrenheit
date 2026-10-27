@@ -26,6 +26,10 @@ public unsafe static class Globals {
         public static int*  to_be_deleted_handle => FhUtil.ptr_at<int> (0x864CB0);
         public static int*  effect_ptr           => FhUtil.ptr_at<int> (0xD33360);
         public static byte* effect_status_flag   => FhUtil.ptr_at<byte>(0xD33364);
+
+        // The import table handed to every magic_*.dll's InitMagicPRX (MagicFile_Start): 744 slots, 0xBA0 bytes.
+        // The first 741 are FFX.exe functions, the overlays' only way into the game; the last ones are data pointers.
+        public static nint* imports => FhUtil.ptr_at<nint>(0x864CE8);
     }
 
     public static class Atel {
