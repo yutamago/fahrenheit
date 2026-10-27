@@ -21,14 +21,7 @@ using EflIndex = Dictionary<string, string>;
 ///     and the ability to cross-load the inactive game's assets from the active game.
 /// </summary>
 /// <remarks>
-///     Place any files you wish to use in this way
-///     in the <c>efl\x</c> or <c>efl\x2</c> subdirectory of your mod folder.
-///     <para/>
-///     These subdirectories are treated as the root of the VBF archive for their respective games;
-///     from that point, you must mirror the VBF's directory structure.
-///     <para/>
-///     For example, to replace <c>FFX_Data\ffx_ps2\ffx\master\jppc\battle\kernel\takara.bin</c>,
-///     the full path is <c>{...}\efl\x\FFX_Data\ffx_ps2\ffx\master\jppc\battle\kernel\takara.bin</c>.
+///     See <see href="https://github.com/fahrenheit-crew/fahrenheit/wiki/Mod-structure#efl"/>.
 /// </remarks>
 [FhLoad(FhGameId.FFX | FhGameId.FFX2 | FhGameId.FFX2LM)]
 [SupportedOSPlatform("windows6.1")]
@@ -316,31 +309,31 @@ public unsafe sealed class FhFileLoaderModule : FhModule {
             }
 
             fixed (char* ptr_path_modded = path_modded) {
-                FILE_ACCESS_RIGHTS        access      = read_only
-                    ? FILE_ACCESS_RIGHTS.FILE_READ_DATA
-                    : FILE_ACCESS_RIGHTS.FILE_WRITE_DATA;
-                FILE_SHARE_MODE           sharing     = read_only
-                    ? FILE_SHARE_MODE.FILE_SHARE_READ
-                    : FILE_SHARE_MODE.FILE_SHARE_NONE;
-                FILE_CREATION_DISPOSITION disposition = read_only
-                    ? FILE_CREATION_DISPOSITION.OPEN_EXISTING
-                    : FILE_CREATION_DISPOSITION.OPEN_ALWAYS;
+                uint access = (uint)(read_only
+                    ? FILE.FILE_READ_DATA
+                    : FILE.FILE_WRITE_DATA);
+                uint sharing = (uint)(read_only
+                    ? FILE.FILE_SHARE_READ
+                    : 0);
+                uint disposition = (uint)(read_only
+                    ? OPEN.OPEN_EXISTING
+                    : OPEN.OPEN_ALWAYS);
 
-                FILE_FLAGS_AND_ATTRIBUTES flags = FILE_FLAGS_AND_ATTRIBUTES.FILE_FLAG_SEQUENTIAL_SCAN;
+                uint flags = FILE.FILE_FLAG_SEQUENTIAL_SCAN;
 
                 ptr_this->handle_vbf = null;
-                ptr_this->handle_os  = PInvoke.CreateFileW(
+                ptr_this->handle_os  = Windows.CreateFileW(
                     ptr_path_modded,
-                    (uint)access,
+                    access,
                     sharing,
                     null,
                     disposition,
                     flags,
-                    HANDLE.Null
+                    HANDLE.NULL
                 );
             }
 
-            if (ptr_this->handle_os == HANDLE.INVALID_HANDLE_VALUE) {
+            if (ptr_this->handle_os == HANDLE.INVALID_VALUE) {
                 _logger.Error($"Replacement file open failed for {path_modded} - bailing out");
 
                 PStreamFile* rv = FhCall.Phyre_PSerialization_PStreamFile_ctor.chain_from(h_fopen).fnptr!(ptr_this, ptr_path_normalized, read_only, p3, p4, p5);

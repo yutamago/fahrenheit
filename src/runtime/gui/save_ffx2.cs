@@ -53,6 +53,11 @@ public sealed class FhSaveUiX2 : FhSaveUi {
     private const uint COLOR_BLACK = 0xFF000000;
     private const uint COLOR_TRANS = 0x00000000;
 
+    private static readonly float ACTION_VOLUME =
+        FhGlobal.game_id is FhGameId.FFX
+            ? 1f
+            : 0.5f;
+
     private UiMode  _mode;
     private UiFocus _focus;
 
@@ -67,20 +72,17 @@ public sealed class FhSaveUiX2 : FhSaveUi {
 
     private bool _loaded_all_textures;
 
-    private readonly Dictionary<string, FhTexture> _face_icon_textures = [ ];
-    private readonly Dictionary<string, FhTexture> _map_icon_textures  = [ ];
+    private readonly FhTexture _texture_face_icon_default = new(Path.Join(MENU_FACE_DATA_DIR, "mface_000.dds.phyre"), FhTextureType.GAME_PHYRE_2D);
+    private readonly FhTexture _texture_map_icon_default  = new(Path.Join(MAP_ICONS_DIR,      "logo_j.png"),          FhTextureType.GAME);
 
-    private readonly FhTexture _texture_face_icon_default = new(Path.Join(MENU_FACE_DATA_DIR, "mface_000.dds.phyre"), FhTextureType.PHYRE);
-    private readonly FhTexture _texture_map_icon_default  = new(Path.Join(MAP_ICONS_DIR,      "logo_j.png"),          FhTextureType.PNG);
+    private readonly FhTexture _texture_menuback = new(Path.Join(MENU_D3D11_DIR,   "menuback.dds.phyre"),             FhTextureType.GAME_PHYRE_2D);
+    private readonly FhTexture _texture_black0   = new(Path.Join(MENU_PLATE_DIR,   "black0.dds.phyre"),               FhTextureType.GAME_PHYRE_2D);
+    private readonly FhTexture _texture_mahojin  = new(Path.Join(MENU_MAHOJIN_DIR, "14336_19_0_0_512_512.dds.phyre"), FhTextureType.GAME_PHYRE_2D);
+    private readonly FhTexture _texture_plate    = new(Path.Join(MENU_PLATE_DIR,   "12288_19_0_0_256_256.dds.phyre"), FhTextureType.GAME_PHYRE_2D);
+    private readonly FhTexture _texture_freetex  = new(Path.Join(MENU_D3D11_DIR,   "freetex.dds.phyre"),              FhTextureType.GAME_PHYRE_2D);
+    private readonly FhTexture _texture_x2_bg    = new(Path.Join(MENU_D3D11_DIR,   "x2_bg.dds.phyre"),                FhTextureType.GAME_PHYRE_2D);
 
-    private readonly FhTexture _texture_menuback = new(Path.Join(MENU_D3D11_DIR,   "menuback.dds.phyre"),             FhTextureType.PHYRE);
-    private readonly FhTexture _texture_black0   = new(Path.Join(MENU_PLATE_DIR,   "black0.dds.phyre"),               FhTextureType.PHYRE);
-    private readonly FhTexture _texture_mahojin  = new(Path.Join(MENU_MAHOJIN_DIR, "14336_19_0_0_512_512.dds.phyre"), FhTextureType.PHYRE);
-    private readonly FhTexture _texture_plate    = new(Path.Join(MENU_PLATE_DIR,   "12288_19_0_0_256_256.dds.phyre"), FhTextureType.PHYRE);
-    private readonly FhTexture _texture_freetex  = new(Path.Join(MENU_D3D11_DIR,   "freetex.dds.phyre"),              FhTextureType.PHYRE);
-    private readonly FhTexture _texture_x2_bg    = new(Path.Join(MENU_D3D11_DIR,   "x2_bg.dds.phyre"),                FhTextureType.PHYRE);
-
-    private readonly FhTexture _texture_ffx_faces = new(Path.Join(FFX_MENU_D3D11_DIR, "face_ply.dds.phyre"), FhTextureType.PHYRE);
+    private readonly FhTexture _texture_ffx_faces = new(Path.Join(FFX_MENU_D3D11_DIR, "face_ply.dds.phyre"), FhTextureType.GAME_PHYRE_2D);
 
     private readonly Vector2 _tex_face_size     = new(256f, 256f);
     private readonly Vector2 _tex_map_icon_size = new(320f, 176f);
@@ -94,7 +96,20 @@ public sealed class FhSaveUiX2 : FhSaveUi {
 
     private readonly Vector2 _tex_ffx_faces_size = new(1024f, 512f);
 
-    private bool is_saving => FhApi.Saves.get_system_mode(out FhSaveSystemMode? system_mode) && system_mode is FhSaveSystemMode.SAVE;
+    private FhTexture[] textures => [
+        _texture_menuback,
+        _texture_black0,
+        _texture_mahojin,
+        _texture_plate,
+        _texture_freetex,
+        _texture_x2_bg,
+        _texture_ffx_faces,
+
+        _texture_face_icon_default,
+        // _texture_map_icon_default,
+    ];
+
+    private bool is_saving => FhApi.Saves.impl_get_system_mode(out FhSaveSystemMode? system_mode) && system_mode is FhSaveSystemMode.SAVE;
 
     private readonly SteppedScrollable _scrollable_saves = new(visible: 5);
     private readonly SteppedScrollable _scrollable_sets  = new(visible: 9);
@@ -103,8 +118,6 @@ public sealed class FhSaveUiX2 : FhSaveUi {
 
     private bool     _scrollbar_dragging;
     private Vector2? _scrollbar_held_pos;
-
-    private float _volume = FhGlobal.game_id is FhGameId.FFX ? 1f : 0.5f;
 
     // We block input when fading out, for example so you can't requests two loads of a file.
     // We block input when fading in as well, but only for a short time to make the UI feel snappy.
@@ -183,7 +196,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             if (FhApi.Gui.is_any_pressed(FhApi.Gui.keys_up)
              && _current_scrollable.hovered == 0
             ) {
-                FhApi.Audio.play_sound(SoundId.UI_ACTION, _volume);
+                FhApi.Audio.play_sound(SoundId.UI_ACTION, ACTION_VOLUME);
                 _focus = UiFocus.ACTIVE_SET;
                 return true;
             }
@@ -206,14 +219,15 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             int hovered = _current_scrollable.hovered;
 
             if (_mode == UiMode.SAVE_LIST) {
-                FhApi.Audio.play_sound(SoundId.UI_ACTION);
+                FhApi.Audio.play_sound(SoundId.UI_ACTION, ACTION_VOLUME);
 
                 if (is_saving && hovered == 0) {
-                    fade_out(() => FhApi.Saves.save(0));
+                    fade_out(() => FhApi.Saves.impl_execute(0));
                 }
                 else {
-                    FhSaveDisplayData save = FhApi.Saves.display_data[hovered];
-                    fade_out(() => execute(save.slot));
+                    if (FhApi.Saves.sets_get_ui_data(hovered, out FhSaveUiData data)) {
+                        fade_out(() => FhApi.Saves.impl_execute(data.slot));
+                    }
                 }
 
                 return true;
@@ -234,7 +248,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
 
     private bool handle_input_active_set() {
         if (_mode == UiMode.SAVE_LIST && FhApi.Gui.is_any_pressed(FhApi.Gui.keys_down) && _current_scrollable.max > 0) {
-            FhApi.Audio.play_sound(SoundId.UI_ACTION, _volume);
+            FhApi.Audio.play_sound(SoundId.UI_ACTION, ACTION_VOLUME);
 
             _focus = UiFocus.LIST;
             _current_scrollable.hovered = _current_scrollable.current;
@@ -263,7 +277,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             if (_mode == UiMode.SET_SWAP)
                 change_mode(UiMode.SAVE_LIST);
             else
-                fade_out(() => FhApi.Saves.exit_cancel());
+                fade_out(() => FhApi.Saves.impl_abort());
         }
     }
 
@@ -271,17 +285,17 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         _mode  = UiMode .SAVE_LIST;
         _focus = UiFocus.LIST;
 
-        populate_face_icons();
-        populate_map_icons();
         try_load_textures();
 
         _set_list.Clear();
-        _set_list.AddRange(FhApi.Saves.get_sets());
+        _set_list.AddRange(FhApi.Saves.sets_enumerate());
+
+        FhSaveSet set = FhApi.Saves.sets_get_active();
 
         _scrollable_sets .max = _set_list.Count;
         _scrollable_saves.max = is_saving
-            ? FhApi.Saves.get_slots_used() + 1 // Add one for New Save Data button
-            : FhApi.Saves.display_data.Count;
+            ? set.count + 1 - (set.has_autosave ? 1 : 0) // Add one for New Save Data button
+            : set.count;
 
         _fade.restart(COLOR_BLACK, COLOR_TRANS, _fade_length);
     }
@@ -290,7 +304,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         _scrollable_saves.reset();
         _scrollable_sets .reset();
 
-        unload_textures();
+        unload_textures(textures);
     }
 
     private void change_mode(UiMode new_mode) {
@@ -300,22 +314,9 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         _mode  = new_mode;
     }
 
-    private void execute(int slot) {
-        if (!FhApi.Saves.get_system_mode(out FhSaveSystemMode? system_mode)) return;
-
-        switch (system_mode) {
-            case FhSaveSystemMode.SAVE: FhApi.Saves.save(slot); break;
-            case FhSaveSystemMode.LOAD: FhApi.Saves.load(slot); break;
-
-            default: throw new InvalidOperationException();
-        }
-    }
-
     private void switch_set(string set_name) {
-        FhApi.Saves.switch_active_set(set_name);
+        FhApi.Saves.sets_switch(set_name);
 
-        populate_face_icons();
-        populate_map_icons();
         try_load_textures();
 
         change_mode(UiMode.SAVE_LIST);
@@ -352,103 +353,13 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         );
     }
 
-    /// <returns>The correct filename for the face icon.</returns>
-    private static string remap_job(byte ply_id, byte job_id) {
-        if (job_id == 0x21) return "mface_147.dds.phyre"; // She-Goon
-
-        string ply = ply_id switch {
-            0 => "yuna",
-            1 => "rikku",
-            2 => "paine",
-            _ => "m"
-        };
-
-        // Rewires Rikku's and Paine's job IDs to match original filenames
-        byte job = job_id switch {
-            24 or
-            25 => 12, // Trainer
-            26 or
-            27 => 14, // Mascot
-            28 => 16, // Psychic
-            29 or
-            30 or
-            31 => 17, // Festivalist
-            32 => 18, // Freelancer
-            _  => job_id
-        };
-
-        return $"{ply}face_{job:D3}.dds.phyre";
-    }
-
-    private void populate_face_icons() {
-        _face_icon_textures.Clear();
-
-        foreach (FhSaveDisplayData save in FhApi.Saves.display_data) {
-            FhSaveHeader2 header2 = MemoryMarshal.Read<FhSaveHeader2>(save.header);
-
-            bool is_lm     = FhGlobal.game_id is FhGameId.FFX2LM;
-            int  num_faces = is_lm ? 1 : 3;
-
-            for (int i = 0; i < num_faces; i++) {
-                byte ply_id = is_lm ? header2.lm_ply : header2.ply[i];
-                byte job_id = is_lm ? header2.lm_job : header2.ply_jobs[i];
-
-                if (job_id > 0x21) continue;
-
-                string face = remap_job(ply_id, job_id);
-
-                if (_face_icon_textures.TryGetValue(face, out _)) continue;
-
-                FhTexture face_icon = new(Path.Join(MENU_FACE_DATA_DIR, face), FhTextureType.PHYRE);
-
-                _face_icon_textures.Add(
-                    face,
-                    face_icon
-                );
-            }
-        }
-    }
-
-    private void populate_map_icons() {
-        _map_icon_textures.Clear();
-
-        foreach (FhSaveDisplayData save in FhApi.Saves.display_data) {
-            string map = Encoding.UTF8.GetString(save.icon_map);
-            if (_map_icon_textures.TryGetValue(map, out _)) continue;
-
-            // TODO: Handle some map icons that use "{map}_1.png" across both games
-            string map_icon_path = FhGlobal.game_id is FhGameId.FFX
-                ? Path.Join(FFX_MAP_ICONS_DIR, $"{map}.png")
-                : Path.Join(MAP_ICONS_DIR,     $"{map}_0.png");
-
-            FhTexture map_icon = new(map_icon_path, FhTextureType.PNG);
-            _map_icon_textures.Add(
-                map,
-                map_icon
-            );
-        }
-    }
-
     /// <summary>Attempt to load all of the textures the save/load screen requires to display properly.</summary>
     /// <returns>Whether all textures have been successfully loaded.</returns>
     private bool try_load_textures() {
-        Span<FhTexture> textures = [
-            _texture_menuback,
-            _texture_black0,
-            _texture_mahojin,
-            _texture_plate,
-            _texture_freetex,
-            _texture_x2_bg,
-            _texture_face_icon_default,
-            .. _face_icon_textures.Values,
-            // _texture_map_icon_default,
-            // .. _map_icon_textures.Values,
-            _texture_ffx_faces
-        ];
-
         _loaded_all_textures = true;
+
         foreach (FhTexture texture in textures) {
-            if (!FhApi.Resources.load_game_texture_2d(texture)) {
+            if (!FhApi.Resources.load_texture(texture)) {
                 _loaded_all_textures = false;
             }
         }
@@ -457,22 +368,8 @@ public sealed class FhSaveUiX2 : FhSaveUi {
     }
 
     /// <summary>Unload all of the textures the renderer requires to display properly.</summary>
-    private void unload_textures() {
-        Span<FhTexture> textures = [
-            _texture_menuback,
-            _texture_black0,
-            _texture_mahojin,
-            _texture_plate,
-            _texture_freetex,
-            _texture_x2_bg,
-            _texture_face_icon_default,
-            .. _face_icon_textures.Values,
-            // _texture_map_icon_default,
-            // .. _map_icon_textures.Values,
-            _texture_ffx_faces
-        ];
-
-        foreach (FhTexture texture in textures) {
+    private void unload_textures(Span<FhTexture> texture_list) {
+        foreach (FhTexture texture in texture_list) {
             if (FhApi.Resources.unload_texture(texture))
                 _loaded_all_textures = false;
             else
@@ -581,7 +478,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
     private void ui_help() {
         if (!_texture_freetex.try_use(out ImTextureRef freetex, out _)) return;
 
-        if (!FhApi.Saves.get_system_mode(out FhSaveSystemMode? system_mode)) return;
+        if (!FhApi.Saves.impl_get_system_mode(out FhSaveSystemMode? system_mode)) return;
 
         ImDrawListPtr draw = ImGui.GetBackgroundDrawList();
 
@@ -669,21 +566,18 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             text,
             font_size,
             true,
-            new(Alignment.BEGIN, Alignment.CENTER)
+            Alignment2D.LEFT
         );
     }
 
     /// <summary>Render the active set name and set count.</summary>
     private void ui_savecount() {
-        string active_set   = FhApi.Saves.active_set;
-        bool   has_autosave = FhApi.Saves.set_has_autosave(active_set);
-
-        int save_count = FhApi.Saves.get_slots_used();
+        FhSaveSet set = FhApi.Saves.sets_get_active();
 
         //TODO: Add localization
-        string save_text = has_autosave
-            ? $" + {save_count} saves"
-            : $"{save_count} saves";
+        string save_text = set.has_autosave
+            ? $" + {set.count - 1} saves"
+            : $"{set.count} saves";
 
         Vector2 text_pos = new(1717f, 146f);
 
@@ -698,10 +592,10 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             save_text,
             font_size,
             true,
-            new(Alignment.END, Alignment.CENTER)
+            Alignment2D.RIGHT
         );
 
-        if (has_autosave) {
+        if (set.has_autosave) {
             Vector2 autosave_pos = text_pos * aspect_scale + aspect_helper.pos;
             autosave_pos.X -= saves_text_size.X;
 
@@ -711,7 +605,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
                 "A",
                 font_size,
                 true,
-                new(Alignment.END, Alignment.CENTER),
+                Alignment2D.RIGHT,
                 0xFF19D8FF
             );
         }
@@ -721,10 +615,10 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         FhApi.Gui.draw_text(
             draw,
             second_line_pos * aspect_scale + aspect_helper.pos,
-            active_set,
+            set.name,
             font_size,
             true,
-            new(Alignment.END, Alignment.CENTER)
+            Alignment2D.RIGHT
         );
     }
 
@@ -847,7 +741,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         UV bg_suv = bg_screen.as_uv();
 
         if (mouse_hovered(bg_screen) && _focus != UiFocus.ACTIVE_SET) {
-            FhApi.Audio.play_sound(SoundId.UI_ACTION, _volume);
+            FhApi.Audio.play_sound(SoundId.UI_ACTION, ACTION_VOLUME);
             _focus = UiFocus.ACTIVE_SET;
         }
 
@@ -906,7 +800,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             text,
             font_size,
             true,
-            new(Alignment.CENTER, Alignment.CENTER)
+            Alignment2D.CENTER
         );
 
         if (_focus == UiFocus.ACTIVE_SET) {
@@ -949,7 +843,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
 
         button.pos.Y += (button.size.Y + 10f) * (set_idx - start_idx);
 
-        Rect button_no_shadow = button.expand(new Vector2(-6f, -5f), new(Alignment.BEGIN, Alignment.BEGIN));
+        Rect button_no_shadow = button.expand(new Vector2(-6f, -5f), Alignment2D.TOP_LEFT);
         Rect button_scaled    = button.scale_to_aspect(aspect_helper);
 
         UV button_suv = button_scaled.as_uv();
@@ -970,7 +864,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
 
         if (mouse_hovered(button_scaled)) {
             if (_focus != UiFocus.LIST || _scrollable_sets.hovered != set_idx) {
-                FhApi.Audio.play_sound(SoundId.UI_ACTION, _volume);
+                FhApi.Audio.play_sound(SoundId.UI_ACTION, ACTION_VOLUME);
             }
 
             _focus = UiFocus.LIST;
@@ -1016,10 +910,10 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             name,
             font_size,
             true,
-            new(Alignment.BEGIN, Alignment.CENTER)
+            Alignment2D.LEFT
         );
 
-        bool has_autosave = FhApi.Saves.set_has_autosave(name);
+        bool has_autosave = FhApi.Saves.sets_get(name, out FhSaveSet? set) && set.has_autosave;
 
         Vector2 save_count_size = FhApi.Gui.draw_text(
             draw,
@@ -1027,7 +921,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             has_autosave ? $" + {save_count - 1} saves" : $"{save_count} saves",
             font_size,
             true,
-            new(Alignment.END, Alignment.CENTER)
+            Alignment2D.RIGHT
         );
 
         if (has_autosave) {
@@ -1040,7 +934,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
                 "A",
                 font_size,
                 true,
-                new(Alignment.END, Alignment.CENTER),
+                Alignment2D.RIGHT,
                 0xFF19D8FF
             );
         }
@@ -1065,24 +959,25 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         int end_idx   = _scrollable_sets.get_clip_end();
 
         for (int set_idx = start_idx; set_idx < end_idx; set_idx++) {
-            string set_name   = _set_list[set_idx];
-            int    save_count = FhApi.Saves.get_save_counts()[set_name];
+            string set_name = _set_list[set_idx];
+
+            if (!FhApi.Saves.sets_get(set_name, out FhSaveSet? set))
+                continue;
+
+            int save_count = set.count;
 
             ui_set(set_idx, set_name, save_count);
         }
     }
 
     private void ui_savelist() {
-        List<FhSaveDisplayData> display_data = FhApi.Saves.display_data;
-        if (is_saving && FhApi.Saves.set_has_autosave(FhApi.Saves.active_set)) {
-            display_data = display_data[1..];
-        }
+        FhSaveSet set = FhApi.Saves.sets_get_active();
 
         _scrollable_saves.max = is_saving
-            ? display_data.Count + 1
-            : display_data.Count;
+            ? set.count + 1 - (set.has_autosave ? 1 : 0) // Add one for New Save Data button
+            : set.count;
 
-        if (!is_saving && display_data.Count == 0) {
+        if (!is_saving && set.count == 0) {
             ui_no_saves();
             return;
         }
@@ -1090,14 +985,21 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         int start = _scrollable_saves.get_clip_start();
         int end   = _scrollable_saves.get_clip_end();
 
+        int ui_data_start = is_saving && set.has_autosave ? 1 : 0;
+
         for (int i = start; i < end; i++) {
-            bool is_new_data = is_saving && i == 0;
+            if (is_saving && i == 0) { // New Save Data
+                ui_savefile(0, new FhSaveUiData { slot = 0 });
+                continue;
+            }
 
-            FhSaveDisplayData save = is_new_data
-                ? new FhSaveDisplayData { slot = 0 }
-                : display_data[is_saving ? i - 1 : i];
+            int ui_data_index = is_saving
+                ? ui_data_start + i - 1
+                : ui_data_start + i;
 
-            ui_savefile(i, save);
+            if (FhApi.Saves.sets_get_ui_data(ui_data_index, out FhSaveUiData save)) {
+                ui_savefile(i, save);
+            }
         }
     }
 
@@ -1121,7 +1023,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         Rect window = new Rect {
             pos  = FhApi.Gui.display_size / 2f,
             size = Vector2.Zero,
-        }.expand(window_size, new(Alignment.CENTER, Alignment.CENTER));
+        }.expand(window_size, Alignment2D.CENTER);
 
         draw.AddRectFilled(
             window.top_left,
@@ -1171,11 +1073,11 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             message,
             font_size,
             true,
-            new(Alignment.CENTER, Alignment.CENTER)
+            Alignment2D.CENTER
         );
     }
 
-    private void ui_savefile(int index, FhSaveDisplayData save) {
+    private void ui_savefile(int index, FhSaveUiData save) {
         if (!_scrollable_saves.is_within_clip(index)) return;
 
         if (!_texture_plate.try_use(out ImTextureRef plate, out _)) return;
@@ -1194,7 +1096,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         // We set the hovered state early to potentially use it later.
         if (mouse_hovered(save_rect.scale_to_aspect(aspect_helper))) {
             if (_focus != UiFocus.LIST || _scrollable_saves.hovered != index) {
-                FhApi.Audio.play_sound(SoundId.UI_ACTION, _volume);
+                FhApi.Audio.play_sound(SoundId.UI_ACTION, ACTION_VOLUME);
             }
 
             _focus = UiFocus.LIST;
@@ -1323,12 +1225,12 @@ public sealed class FhSaveUiX2 : FhSaveUi {
 
         // Handle input
         if (mouse_clicked(save_rect.scale_to_aspect(aspect_helper))) {
-            FhApi.Audio.play_sound(SoundId.UI_ACTION);
-            fade_out(() => execute(save.slot));
+            FhApi.Audio.play_sound(SoundId.UI_ACTION, ACTION_VOLUME);
+            fade_out(() => FhApi.Saves.impl_execute(save.slot));
         }
     }
 
-    private void ui_savefile_details_x(Rect save_rect, FhSaveDisplayData save) {
+    private void ui_savefile_details_x(Rect save_rect, FhSaveUiData save) {
         if (save.slot == 0 && is_saving) return;
 
         if (!_texture_ffx_faces.try_use(out ImTextureRef faces, out _)) return;
@@ -1367,7 +1269,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
 
         Vector2 face_screen_offset = new Vector2(face_size.X + face_gap, 0f) * aspect_scale;
 
-        FhSaveHeader header = MemoryMarshal.Read<FhSaveHeader>(save.header);
+        SaveHeaderX header = save.header.x;
 
         foreach (int chr in header.formation[..3]) {
             if (chr == 0xFF) continue;
@@ -1380,8 +1282,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         }
 
         /* ===== Location Icon ===== */
-        string    map     = Encoding.UTF8.GetString(save.icon_map);
-        FhTexture tex_map = _map_icon_textures.GetValueOrDefault(map, _texture_map_icon_default);
+        FhTexture tex_map = save.icon_map;
 
         // if (tex_map.try_use(out ImTextureRef map_icon, out _)) {
         //     UV tuv = new(new(0f, 1f), new(1f, 0f));
@@ -1399,8 +1300,6 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         //         tuv.p1
         //     );
         // }
-
-        /* ===== Text ===== */
 
         /* ===== Header Details ===== */
         float border_thickness =  5f;
@@ -1426,7 +1325,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             slot_text,
             font_size,
             true,
-            new(Alignment.BEGIN, Alignment.CENTER),
+            Alignment2D.LEFT,
             save.slot == 0 ? 0xFF19D8FF : 0xFFFFFFFF // Autosave text is yellow
         );
 
@@ -1446,7 +1345,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
                 save.location,
                 font_size,
                 true,
-                new(Alignment.BEGIN, Alignment.CENTER)
+                Alignment2D.LEFT
             );
         }
 
@@ -1464,7 +1363,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             create_time,
             font_size,
             true,
-            new(Alignment.END, Alignment.CENTER)
+            Alignment2D.RIGHT
         );
 
         /* ===== Info Details ===== */
@@ -1483,7 +1382,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             save.player_name,
             font_size,
             true,
-            new(Alignment.BEGIN, Alignment.CENTER)
+            Alignment2D.LEFT
         );
 
         info_text_pos.Y += line_height;
@@ -1494,11 +1393,11 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             save.play_time,
             font_size,
             true,
-            new(Alignment.BEGIN, Alignment.CENTER)
+            Alignment2D.LEFT
         );
     }
 
-    private void ui_savefile_details_x2(Rect save_rect, FhSaveDisplayData save) {
+    private void ui_savefile_details_x2(Rect save_rect, FhSaveUiData save) {
         if (save.slot == 0 && is_saving) return;
 
         ImDrawListPtr draw = ImGui.GetBackgroundDrawList();
@@ -1525,19 +1424,18 @@ public sealed class FhSaveUiX2 : FhSaveUi {
 
         Vector2 face_screen_offset = new Vector2(face_size.X + face_gap, 0f) * aspect_scale;
 
-        FhSaveHeader2 header2 = MemoryMarshal.Read<FhSaveHeader2>(save.header);
+        SaveHeaderX2 header = save.header.x2;
 
         for (byte i = 0; i < 3; i++) {
-            byte ply_id = header2.ply[i];
-            byte job_id = header2.ply_jobs[i];
+            byte ply_id = header.ply[i];
+            byte job_id = header.ply_jobs[i];
 
             if (job_id > 0x21) {
                 face_suv = face_suv.move(face_screen_offset);
                 continue;
             }
 
-            string    filename = remap_job(ply_id, job_id);
-            FhTexture portrait = _face_icon_textures.GetValueOrDefault(filename, _texture_face_icon_default);
+            FhTexture portrait = save.icon_chr[i];
 
             uint alpha = job_id == 0x0 ? 0xA0C0C0C0 : 0xFFFFFFFF;
 
@@ -1556,8 +1454,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         }
 
         /* ===== Location Icon ===== */
-        string    map     = Encoding.UTF8.GetString(save.icon_map);
-        FhTexture tex_map = _map_icon_textures.GetValueOrDefault(map, _texture_map_icon_default);
+        FhTexture tex_map = save.icon_map;
 
         // if (tex_map.try_use(out ImTextureRef map_icon, out _)) {
         //     UV tuv = new(new(0f, 1f), new(1f, 0f));
@@ -1575,8 +1472,6 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         //         tuv.p1
         //     );
         // }
-
-        /* ===== Text ===== */
 
         /* ===== Header Details ===== */
         float border_thickness =  5f;
@@ -1602,12 +1497,12 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             slot_text,
             font_size,
             true,
-            new(Alignment.BEGIN, Alignment.CENTER),
+            Alignment2D.LEFT,
             save.slot == 0 ? 0xFF19D8FF : 0xFFFFFFFF // Autosave text is yellow
         );
 
         // If location string is "NONAME", don't render
-        if (header2.id_location != 0) {
+        if (header.id_location != 0) {
             header_text_pos_l.X -= 1f;
             header_text_pos_l.Y -= 2f;
             header_text_pos_l = header_text_pos_l * aspect_scale + aspect_helper.pos;
@@ -1622,7 +1517,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
                 save.location,
                 font_size,
                 true,
-                new(Alignment.BEGIN, Alignment.CENTER)
+                Alignment2D.LEFT
             );
         }
 
@@ -1640,7 +1535,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             create_time,
             font_size,
             true,
-            new(Alignment.END, Alignment.CENTER)
+            Alignment2D.RIGHT
         );
 
         /* ===== Info Details ===== */
@@ -1669,10 +1564,10 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         string completion;
         if (cjk) {
             info_text_pos_l.X -= cjk_offset;
-            completion = $"STORY COMPLETED: {header2.completion}%";
+            completion = $"STORY COMPLETED: {header.completion}%";
         }
         else {
-            completion = Encoding.UTF8.GetString(save.completion);
+            completion = save.completion;
         }
 
         FhApi.Gui.draw_text(
@@ -1681,7 +1576,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             save.player_name,
             font_size,
             true,
-            new(Alignment.BEGIN, Alignment.CENTER)
+            Alignment2D.LEFT
         );
 
         FhApi.Gui.draw_text(
@@ -1690,7 +1585,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             completion,
             font_size,
             true,
-            new(Alignment.END, Alignment.CENTER)
+            Alignment2D.RIGHT
         );
 
         info_text_pos_l.Y += line_height;
@@ -1702,7 +1597,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             save.chapter,
             font_size,
             true,
-            new(Alignment.BEGIN, Alignment.CENTER)
+            Alignment2D.LEFT
         );
 
         FhApi.Gui.draw_text(
@@ -1711,11 +1606,11 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             save.play_time,
             font_size,
             true,
-            new(Alignment.END, Alignment.CENTER)
+            Alignment2D.RIGHT
         );
     }
 
-    private void ui_savefile_details_lm(Rect save_rect, FhSaveDisplayData save) {
+    private void ui_savefile_details_lm(Rect save_rect, FhSaveUiData save) {
         if (save.slot == 0 && is_saving) return;
 
         ImDrawListPtr draw = ImGui.GetBackgroundDrawList();
@@ -1742,19 +1637,18 @@ public sealed class FhSaveUiX2 : FhSaveUi {
 
         Vector2 face_screen_offset = new Vector2(-face_gap, 0f) * aspect_scale;
 
-        FhSaveHeader2 header2 = MemoryMarshal.Read<FhSaveHeader2>(save.header);
+        SaveHeaderX2 header = save.header.x2;
 
         for (int i = 3; i >= 0; i--) {
-            byte ply_id = header2.lm_ply;
-            byte job_id = header2.lm_job;
+            byte ply_id = header.lm_ply;
+            byte job_id = header.lm_job;
 
             if (job_id > 0x21) {
                 face_suv = face_suv.move(face_screen_offset);
                 continue;
             }
 
-            string    filename = remap_job(ply_id, job_id);
-            FhTexture portrait = _face_icon_textures.GetValueOrDefault(filename, _texture_face_icon_default);
+            FhTexture portrait = save.icon_chr[i];
 
             if (portrait.try_use(out ImTextureRef faces, out _)) {
                 uint alpha = ImGui.GetColorU32(new Vector4(1f, 1f, 1f, 1f - (i * 0.25f)));
@@ -1773,8 +1667,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         }
 
         /* ===== Location Icon ===== */
-        string    map     = Encoding.UTF8.GetString(save.icon_map);
-        FhTexture tex_map = _map_icon_textures.GetValueOrDefault(map, _texture_map_icon_default);
+        FhTexture tex_map = save.icon_map;
 
         // if (tex_map.try_use(out ImTextureRef map_icon, out _)) {
         //     UV tuv = new(new(0f, 1f), new(1f, 0f));
@@ -1792,8 +1685,6 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         //         tuv.p1
         //     );
         // }
-
-        /* ===== Text ===== */
 
         /* ===== Header Details ===== */
         float border_thickness =  5f;
@@ -1819,12 +1710,12 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             slot_text,
             font_size,
             true,
-            new(Alignment.BEGIN, Alignment.CENTER),
+            Alignment2D.LEFT,
             save.slot == 0 ? 0xFF19D8FF : 0xFFFFFFFF // Autosave text is yellow
         );
 
         // If location string is "NONAME", don't render
-        if (header2.lm_id_location != 0) {
+        if (header.lm_id_location != 0) {
             header_text_pos_l.X -= 3f;
             header_text_pos_l.Y -= 1f;
             header_text_pos_l = header_text_pos_l * aspect_scale + aspect_helper.pos;
@@ -1839,7 +1730,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
                 save.location,
                 font_size,
                 true,
-                new(Alignment.BEGIN, Alignment.CENTER)
+                Alignment2D.LEFT
             );
         }
 
@@ -1857,7 +1748,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             create_time,
             font_size,
             true,
-            new(Alignment.END, Alignment.CENTER)
+            Alignment2D.RIGHT
         );
 
         /* ===== Info Details ===== */
@@ -1883,7 +1774,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             save.player_name,
             font_size,
             true,
-            new(Alignment.BEGIN, Alignment.CENTER)
+            Alignment2D.LEFT
         );
 
         info_text_pos_l.Y += line_height;
@@ -1895,7 +1786,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             save.lm_job,
             font_size,
             true,
-            new(Alignment.BEGIN, Alignment.CENTER)
+            Alignment2D.LEFT
         );
 
         info_text_pos_l = info_text_pos_l * aspect_scale + aspect_helper.pos;
@@ -1907,7 +1798,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             save.lm_level,
             font_size,
             true,
-            new(Alignment.BEGIN, Alignment.CENTER)
+            Alignment2D.LEFT
         );
 
         FhApi.Gui.draw_text(
@@ -1916,7 +1807,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             save.play_time,
             font_size,
             true,
-            new(Alignment.END, Alignment.CENTER)
+            Alignment2D.RIGHT
         );
     }
 
@@ -1944,7 +1835,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             text,
             font_size,
             true,
-            new(Alignment.BEGIN, Alignment.CENTER)
+            Alignment2D.LEFT
         );
 
         /* ===== "+" Icon ===== */
@@ -2050,8 +1941,12 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             size = thumb_size,
         };
 
-        track = track.scale_to_aspect(aspect_helper);
-        thumb = thumb.scale_to_aspect(aspect_helper);
+        Rect scaled_track = track.scale_to_aspect(aspect_helper);
+        Rect scaled_thumb = thumb.scale_to_aspect(aspect_helper);
+
+        // Make sure that the thumb is still in the middle of the track after scaling
+        scaled_thumb.size.X = float.Round(scaled_track.size.X) - float.Round(thumb_margin.X * aspect_scale.X) * 2f;
+        scaled_thumb.pos.X  = float.Round(scaled_track.pos.X) + (float.Round(scaled_track.size.X) - scaled_thumb.size.X) / 2f;
 
         triangle_top    = triangle_top   .scale_to_aspect(aspect_helper);
         triangle_bottom = triangle_bottom.scale_to_aspect(aspect_helper);
@@ -2059,14 +1954,14 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         scrollable_track_height *= aspect_scale.Y;
 
         draw.AddRectFilled(
-            track.top_left,
-            track.bottom_right,
+            scaled_track.top_left,
+            scaled_track.bottom_right,
             track_color
         );
 
         draw.AddRectFilledMultiColor(
-            thumb.top_left,
-            thumb.bottom_right,
+            scaled_thumb.top_left,
+            scaled_thumb.bottom_right,
             thumb_color_top,
             thumb_color_top,
             thumb_color_bottom,
@@ -2075,12 +1970,12 @@ public sealed class FhSaveUiX2 : FhSaveUi {
 
         Rect triangle_top_outline_bounds = triangle_top.expand(
             Vector2.Round(new Vector2(2f, 1f) * new Vector2(1f) * aspect_scale) * 2f,
-            new(Alignment.CENTER, Alignment.CENTER)
+            Alignment2D.CENTER
         );
 
         Rect triangle_bot_outline_bounds = triangle_bottom.expand(
             Vector2.Round(new Vector2(2f, 1f) * new Vector2(1f) * aspect_scale) * 2f,
-            new(Alignment.CENTER, Alignment.CENTER)
+            Alignment2D.CENTER
         );
 
         FhApi.Gui.draw_triangle_gradient(
@@ -2122,12 +2017,12 @@ public sealed class FhSaveUiX2 : FhSaveUi {
         // Handle input
 
         // Allow grabbing the thumb on the entire track width
-        Rect expanded_thumb = thumb.expand(
-            new(track.size.X - thumb.size.X),
-            new(Alignment.CENTER, Alignment.CENTER)
+        Rect expanded_thumb = scaled_thumb.expand(
+            new(scaled_track.size.X - scaled_thumb.size.X),
+            Alignment2D.CENTER
         );
 
-        float expanded_track_height = scrollable_track_height + (track.size.X - thumb.size.X);
+        float expanded_track_height = scrollable_track_height + (scaled_track.size.X - scaled_thumb.size.X);
 
         if (mouse_clicked(expanded_thumb)) {
             _scrollbar_dragging = true;
@@ -2164,7 +2059,7 @@ public sealed class FhSaveUiX2 : FhSaveUi {
             _current_scrollable.move_hover(1);
         }
 
-        if ((mouse_hovered(triangle_top) || mouse_hovered(triangle_bottom))
+        if ((mouse_hovered(triangle_top, false) || mouse_hovered(triangle_bottom, false))
          && ImGui.IsMouseDown(ImGuiMouseButton.Left)
         ) {
             _audio_fade_helper_restart = false;
