@@ -52,22 +52,26 @@ public unsafe static class Globals {
         public static BtlWindow* cur_window => windows + FhUtil.get_at<byte>(0x1FCC092);
         public static BtlStatusWindow* status_windows => FhUtil.ptr_at<BtlStatusWindow>(0xF3F7D8);
 
-        // public static byte* hit_chance_table => FhUtil.ptr_at<byte>(0x8421E0);
+        // 9 entries (25, 30, 30, 40, 40, 50, 60, 80, 100): DmgCalc_CheckHit's base hit chance in percent,
+        // indexed by clamp(accuracy * 2 / 5 - evasion + 10, 0, 8).
+        public static byte* hit_chance_table => FhUtil.ptr_at<byte>(0x8421F0);
 
-        // public static EncounterLevel* encounter_level => FhUtil.ptr_at<EncounterLevel>(0xC421C8);
+        // Read by MsBattleEncountExe: None stops random encounters, Tenfold multiplies the step's encounter value by 10.
+        public static EncounterLevel* encounter_level => FhUtil.ptr_at<EncounterLevel>(0x8421D8);
     }
 
     public static class OverdriveInfo {
+        // Seconds per overdrive level: Tidus's are read by NkzGetTidusLimitTime, Auron's by NkzGetAuronLimitTime.
         public static class Times {
-            // public static float* spiral_cut      => FhUtil.ptr_at<float>(0x886BF0);
-            // public static float* slice_and_dice  => FhUtil.ptr_at<float>(0x886BF4);
-            // public static float* energy_rain     => FhUtil.ptr_at<float>(0x886BF8);
-            // public static float* blitz_ace       => FhUtil.ptr_at<float>(0x886BFC);
+            public static float* spiral_cut      => FhUtil.ptr_at<float>(0x886BF0);
+            public static float* slice_and_dice  => FhUtil.ptr_at<float>(0x886BF4);
+            public static float* energy_rain     => FhUtil.ptr_at<float>(0x886BF8);
+            public static float* blitz_ace       => FhUtil.ptr_at<float>(0x886BFC);
 
-            // public static float* dragon_fang     => FhUtil.ptr_at<float>(0x886B60);
-            // public static float* shooting_star   => FhUtil.ptr_at<float>(0x886B64);
-            // public static float* banishing_blade => FhUtil.ptr_at<float>(0x886B68);
-            // public static float* tornado         => FhUtil.ptr_at<float>(0x886B6C);
+            public static float* dragon_fang     => FhUtil.ptr_at<float>(0x886B60);
+            public static float* shooting_star   => FhUtil.ptr_at<float>(0x886B64);
+            public static float* banishing_blade => FhUtil.ptr_at<float>(0x886B68);
+            public static float* tornado         => FhUtil.ptr_at<float>(0x886B6C);
         }
     }
 
