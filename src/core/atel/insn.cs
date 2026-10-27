@@ -25,7 +25,8 @@ public record struct AtelInst(byte instruction, ushort? operand) {
  *    A normal REQ opcode is aborted/fails if the target worker already has a queued same-priority request
  * - `T` ("Tagged") to only send the request if an identical one is not already pending
  * - `B` ("Branching") to only send the request if a predicate allows it.
- *    It is unknown how Branching is meant to be used, or what the predicate is.
+ *    The predicate is the current controller's `req_branch_predicate` (+0x60), called without arguments;
+ *    if it returns 0 the operands are still popped but no request is sent. What installs it is unknown.
  * - `P` ("Player") to send the reqeuest to a specific Chr in combat
  * The Branching prefix may be combined with the Force and Tagged prefixes.
  * Other prefixes cannot be combined

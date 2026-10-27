@@ -218,8 +218,10 @@ public unsafe struct SaveData {
     [FieldOffset(0x2B)]   public byte                  tk_event_new_game;
     [FieldOffset(0x2C)]   public InlineArray8<uint>    affection;
     [FieldOffset(0x4C)]   public InlineArray20<uint>   affection_room_flags; // bitfield
-    [FieldOffset(0xB4)]   public ushort                item_map_x; // meaning unknown
-    [FieldOffset(0xB6)]   public ushort                item_map_y; // meaning unknown
+    [FieldOffset(0xA8)]   public ushort                saved_music;      // Used when loading save: low byte music id, high byte volume; queued for the next music fade
+    [FieldOffset(0xAA)]   public ushort                saved_video_mode; // Used when loading save: graphicSetTextureVideoInfo(low byte, high byte) of the value minus 1
+    [FieldOffset(0xB4)]   public ushort                item_map_x; // world map marker x; set by script native 0x016E, drawn by the world map window when x or y is not 0
+    [FieldOffset(0xB6)]   public ushort                item_map_y; // world map marker y; see item_map_x
     [FieldOffset(0xB8)]   public ushort                saved_current_spawnpoint; // Used when loading save
     [FieldOffset(0xBA)]   public ushort                saved_current_room_id;    // Used when loading save
     [FieldOffset(0xBC)]   public int                   time;

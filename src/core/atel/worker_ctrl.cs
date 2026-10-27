@@ -13,7 +13,8 @@ public unsafe struct AtelWorkerController {
     [FieldOffset(0x18)]  public  ushort           count_0x2e8;
     [FieldOffset(0x1C)]  private AtelBasicWorker* _workers;
     [FieldOffset(0x34)]  public  ushort*          text_chunk;
-    [FieldOffset(0x38)]  public  ushort*          en_text_chunk;  // Not sure what this actually is
+    [FieldOffset(0x38)]  public  ushort*          en_text_chunk;  // a second message table in the same format as text_chunk (8-byte entries, text offset at +0)
+    [FieldOffset(0x60)]  public  delegate* unmanaged[Cdecl]<int> req_branch_predicate; // called by the B*REQ opcodes; 0 = do not send the request
     [FieldOffset(0x1E8)] public  short            __0x1E8; // `npc_last_interaction`, probably the index of the last-interacted-with worker
     [FieldOffset(0x1F8)] public  AtelScriptChunk* script_chunk;
     [FieldOffset(0x1FC)] private byte*            __0x1FC;
