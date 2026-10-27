@@ -5,9 +5,25 @@
 
 namespace Fahrenheit.FFX;
 
+/// <summary>
+///     The flags at <see cref="Actor.chr_flags"/>. Each is named after the function that sets it.
+/// </summary>
 [Flags]
 public enum ActorFlags : uint {
-    KEEP_FPS = 1 << 14,
+    CALC_NORM           = 1 <<  0, // Ch_SetCalcNorm: recompute normals every frame
+    RESERVE_CALC_NORM   = 1 <<  3, // Ch_ReserveCalcNorm: one budgeted normal update, unless CALC_NORM
+    RESERVE_CALC_NORM_2 = 1 <<  4, // Ch_ReserveCalcNorm2: as above, second kind
+    NO_MAP_ID           = 1 <<  7, // Ch_EnMapID(chr, 0): off the ground (the setter stores the inverse)
+    NO_BODY_HIT         = 1 <<  8, // Ch_EnBodyHit(chr, 0): no body collision (the setter stores the inverse)
+    ROT_HOKAN           = 1 << 10, // Ch_EnRotHokan: interpolate rotations
+    CLIP                = 1 << 11, // Ch_EnClip: hide past the clip distance
+    DRAW_EFFECT         = 1 << 13, // Ch_DrawEnEffect
+    SHADE_BY_MAP_ID     = 1 << 18, // Ch_IdEnableShade: shade taken from the map id (the ground triangle's shade fields)
+    CULL                = 1 << 19, // Ch_DrawSetCull
+    KEEP_FPS            = 1 << 20, // Ch_SetKeepFps
+    CLOTH               = 1 << 22, // Ch_ClothSetEnable
+    POS_SET             = 1 << 25, // set by Ch_SetPos
+    OVERLAP_HIT         = 1 << 30, // Ch_SetOverlapHit
 }
 
 [InlineArray(26)]
