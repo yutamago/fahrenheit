@@ -104,7 +104,7 @@ public unsafe static class FhUtil {
         if (offset < 0  || offset >=  sizeof(T) * 8)           throw new ArgumentOutOfRangeException(nameof(offset));
         if (len    <= 0 || len    >  (sizeof(T) * 8) - offset) throw new ArgumentOutOfRangeException(nameof(len));
 
-        for (; len > 0; len--, offset++) { bitfield.set_bit(offset, value.get_bit(offset)); }
+        for (int i = 0; i < len; i++) { bitfield.set_bit(offset + i, value.get_bit(i)); }
     }
 
     internal static JsonSerializerOptions InternalJsonOpts { get; } = new JsonSerializerOptions {
