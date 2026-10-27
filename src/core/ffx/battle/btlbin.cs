@@ -16,7 +16,7 @@ public unsafe struct BtlBinField {
 
     public short id;
     public short data_offset;
-    public short __0x4;
+    public short first_formation_idx; // index of this field's first formation among all formations (MsBtlListCDpos)
     public FieldName name;
 }
 
@@ -37,8 +37,8 @@ public unsafe struct BtlBinEncounter {
 [StructLayout(LayoutKind.Explicit, Size = 0x5)]
 public unsafe struct BtlBinGroup {
     [FieldOffset(0x0)] public byte formation_count;
-    [FieldOffset(0x1)] public short battlefield;
-    [FieldOffset(0x3)] public byte grace;
+    [FieldOffset(0x1)] public short battlefield; // map id in bits 0-9; bit 10 (0x400) set = a battle map, clear = a field map
+    [FieldOffset(0x3)] public byte grace;        // encounter rate; 0 = no random encounters in this group (MsBattleEncountExe)
     [FieldOffset(0x4)] public byte total_weight;
 
     [FieldOffset(0x5)] public BtlBinFormation first_formation;
@@ -52,5 +52,5 @@ public unsafe struct BtlBinGroup {
 [StructLayout(LayoutKind.Sequential)]
 public unsafe struct BtlBinFormation {
     public byte index;
-    public byte weight;
+    public byte weight; // MsBattleEncountExe uses only the high 4 bits (weight >> 4)
 }
