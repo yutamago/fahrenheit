@@ -126,6 +126,33 @@ public static class FhEncoding {
     private static ReadOnlySpan<byte> _op_key     => "{KEY:"u8;     // 0x23
     private static ReadOnlySpan<byte> _op_unknown => "{UNKNOWN:"u8; // any other
 
+    /* What the game does with these ops. Addresses are FFX.exe offsets.
+     * The literals above keep their meaning; this only documents the bytes.
+     *
+     * {SPACE:n} (0x07) moves the pen, `TOSetDrawInfo` (0x4DF8F0). With the raw argument byte `b` (`n + 0x30`):
+     *   0xE0-0xEF  move right by `b - 0xE0` pixels
+     *   '1' (0x31) start a new line (`TOFirstInitMessageNormal`); '8' (0x38) too, on a window whose +0x24 is 0
+     *   '2' (0x32) right-align: pen x = window +0x50 minus the width of the text that follows (`TOGetMessageWH`)
+     *   0x40-0xBF  tab: pen x = window +0x48 + `4 * b - 0x100`
+     *
+     * {TIME:n} (0x09) sets the window's timers, `TOSetDrawInfo`. With the raw argument byte `b`:
+     *   '0' (0x30)  clear the wait (window +0xAC)
+     *   below 0xC0  set the wait to `b - 0x30`
+     *   0xC0-0xFF   set the scroll timer (window +0xB4) to `b - 0xC0`
+     *
+     * {MACRO:i:n} (0x13-0x22) expands in `TOGetChangeMacroAddress` (0x4B6660). The argument byte is `n + 0x30`.
+     * Only 0x19-0x22 read the macro dictionary:
+     *   0x13             (i = 0)       the name of character `n` (`TOGetSaveChrName`)
+     *   0x14, 0x15, 0x18 (i = 1, 2, 5) nothing is expanded; it returns a pointer to the op itself
+     *   0x16, 0x17       (i = 3, 4)    the name of item `n` (`MsGetRomItem`)
+     *   0x19-0x22        (i = 6-15)    section `i` of the macro dictionary, `u16` slot window +0x20 + `2 * n`
+     * {KEY:X2} (0x23) is key item `X2 - 0x30` there (`MsImportantName`); the literal keeps the raw byte.
+     *
+     * 0x0C, 0x0F and 0x11 are written as {UNKNOWN:op:arg}, with an argument byte. The window drawer's
+     * `TOSkipCode` (0x4DFD80) steps over these three as a single byte, so a mod that writes one of them
+     * gets a different next character in a message window.
+     */
+
     /// <summary>
     ///     Returns the UTF-8 plaintext literal corresponding to a given text <paramref name="op_code"/>.
     /// </summary>
