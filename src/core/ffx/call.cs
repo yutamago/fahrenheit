@@ -387,7 +387,7 @@ public static partial class FhCall {
         => new( new FhCallLocation("FFX.exe", 0x5055C0) );
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void d_ToMakeBtlEasyDigit2(int param_1, float param_2, float param_3, byte param_4, float param_5);
+    public delegate void d_ToMakeBtlEasyDigit2(int param_1, float param_2, float param_3, byte param_4, float param_5, float param_6);
     public static FhCallHandle<d_ToMakeBtlEasyDigit2> ToMakeBtlEasyDigit2
         => new( new FhCallLocation("FFX.exe", 0x505550) );
 
@@ -578,7 +578,7 @@ public static partial class FhCall {
 
     // Unofficial naming
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public unsafe delegate void d_TkMenuDrawMain(void* menu);
+    public unsafe delegate void d_TkMenuDrawMain();
     public static FhCallHandle<d_TkMenuDrawMain> TkMenuDrawMain
         => new( new FhCallLocation("FFX.exe", 0x4E0BA0) );
 
@@ -1170,7 +1170,7 @@ public static partial class FhCall {
         => new( new FhCallLocation("FFX.exe", 0x467230) );
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public unsafe delegate int d_FUN_004673d0(byte opcode, AtelBasicWorker* work, AtelWorkThread* thread, AtelStack* stack, uint arg5);
+    public unsafe delegate int d_FUN_004673d0(byte opcode, AtelBasicWorker* work, AtelWorkThread* thread, AtelStack* stack);
     public static FhCallHandle<d_FUN_004673d0> FUN_004673d0
         => new( new FhCallLocation("FFX.exe", 0x4673D0) );
 
@@ -1406,7 +1406,7 @@ public static partial class FhCall {
         => new( new FhCallLocation("FFX.exe", 0x4CC150) );
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public unsafe delegate void d_TkMenuCtrl(TkMenu* menu, int arg);
+    public unsafe delegate void d_TkMenuCtrl(TkMenu* menu);
     public static FhCallHandle<d_TkMenuCtrl> TkMenuCtrlSummon
         => new( new FhCallLocation("FFX.exe", 0x4CC330) );
 
