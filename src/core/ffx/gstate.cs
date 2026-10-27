@@ -32,7 +32,8 @@ public unsafe static class Globals {
         public static int*                  request_count      => FhUtil.ptr_at<int>                 (0xD3456C);
         public static AtelRequest*          request_list       => FhUtil.ptr_at<AtelRequest>         (0xD35D70);
         public static AtelWorkerController* controllers        => FhUtil.ptr_at<AtelWorkerController>(0xF25BA0);
-        public static AtelBasicWorker*      current_worker     => FhUtil.ptr_at<AtelBasicWorker>     (0xF270E4);
+        // The worker AtelGetBasicWork returned last (its lookup cache), not necessarily the one running. 0 = none.
+        public static AtelBasicWorker*      current_worker     => (AtelBasicWorker*)FhUtil.get_at<nint>(0xF270E4);
         public static AtelWorkerController* current_controller => (AtelWorkerController*)FhUtil.get_at<nint>(0xF26B28);
     }
 
