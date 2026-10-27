@@ -11,12 +11,13 @@ namespace Fahrenheit.FFX;
 public unsafe static class Globals {
     public static LocalizationManager* localization_manager => (LocalizationManager*)FhUtil.get_at<nint>(0x8DED58);
 
+    // Set by Sg_IdSetPtr when a walkmesh is installed; all zero (scale 1) without one.
     public static class Map {
-        // public static int*        tri_count => FhUtil.ptr_at<int>       (0xF01A48);
-        // public static VpaTri*     tris      => FhUtil.ptr_at<VpaTri>    (0xF01A44);
-        // public static VpaVertex*  vertices  => FhUtil.ptr_at<VpaVertex> (0xF01A4C);
-        // public static float*      scale     => FhUtil.ptr_at<float>     (0xF01A50);
-        // public static VpaNavMesh* navmesh   => FhUtil.ptr_at<VpaNavMesh>(0xF01A54);
+        public static int*        tri_count => FhUtil.ptr_at<int>(0xF01A88);
+        public static VpaTri*     tris      => (VpaTri*)    FhUtil.get_at<nint>(0xF01A84);
+        public static VpaVertex*  vertices  => (VpaVertex*) FhUtil.get_at<nint>(0xF01A8C);
+        public static float*      scale     => FhUtil.ptr_at<float>(0xF01A90); // navmesh->scale / 10
+        public static VpaNavMesh* navmesh   => (VpaNavMesh*)FhUtil.get_at<nint>(0xF01A94);
     }
 
     public static class Magic {
